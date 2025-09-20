@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+#Media files
+/taskflow/media
+
+# vscode files
+.vscode/
