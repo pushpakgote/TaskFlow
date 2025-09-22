@@ -14,7 +14,20 @@ PRIORITY_CHOICES = [
     ('High', 'High'),
 ]
 
-# Create your models here.
+class ProjectQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(active=True)
+    
+    def upcomming(self):
+        return self.filter(due_date__gte=timezone.now())
+    
+class ProjectManager(models.Manager):
+    def get_queryset(self):
+        return ProjectQuerySet(self.model,using=self._db)
+    
+    def all(self):
+        return self.get_queryset().active().upcomming()
+    
 class Project(models.Model):
     owner=models.ForeignKey(User,on_delete=models.CASCADE,related_name='projects')
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
@@ -27,6 +40,8 @@ class Project(models.Model):
     active=models.BooleanField(default=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects=ProjectManager()
 
     def __str__(self):
         return self.name
