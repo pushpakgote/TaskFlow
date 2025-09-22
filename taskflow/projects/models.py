@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 import uuid
+from teams.models import Team
 
 STATUS_CHOICES = [
     ('To Do', 'To Do'),
@@ -31,6 +32,7 @@ class ProjectManager(models.Manager):
 class Project(models.Model):
     owner=models.ForeignKey(User,on_delete=models.CASCADE,related_name='projects')
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
+    team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, related_name='projects')
     name=models.CharField(max_length=255)
     description=models.TextField(blank=True,null=True)
     status=models.CharField(max_length=20,choices=STATUS_CHOICES,default='To Do')
