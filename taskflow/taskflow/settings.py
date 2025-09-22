@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'projects',
     'accounts',
     'tasks',
+    'notifications',
 ]
 
 MIDDLEWARE = [
