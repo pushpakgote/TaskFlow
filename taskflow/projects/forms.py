@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from tempus_dominus.widgets import DatePicker
 from .models import Project
 from teams.models import Team
@@ -20,14 +20,14 @@ class ProjectForm(forms.ModelForm):
         label=False,
         required=False
     )
-    owner = forms.ModelChoiceField(
-        queryset=User.objects.filter(is_active=True),
-        widget=forms.Select(
-            attrs={'class':'form-control'}
-        ),
-        label=False,
-        required=True
-    )
+    # owner = forms.ModelChoiceField(
+    #     queryset=User.objects.filter(is_active=True),
+    #     widget=forms.Select(
+    #         attrs={'class':'form-control'}
+    #     ),
+    #     label=False,
+    #     required=True
+    # )
     team = forms.ModelChoiceField(
         queryset=Team.objects.all(),
         widget=forms.Select(
@@ -70,6 +70,19 @@ class ProjectForm(forms.ModelForm):
         label=False,
         required=True
     )
+    total_amount = forms.DecimalField(
+        label=False,
+        required=False
+    )
+    amount_spent = forms.DecimalField(
+        label=False,
+        required=False
+    )
+    estimated_duration = forms.IntegerField(
+        label=False,
+        required=False
+    )   
+
     class Meta:
         model = Project
-        fields = ['name', 'owner', 'team', 'client_company', 'description', 'status', 'priority', 'start_date', 'due_date']
+        fields = ['name', 'team', 'client_company', 'description', 'status', 'priority', 'start_date', 'due_date',"total_amount","amount_spent","estimated_duration"]

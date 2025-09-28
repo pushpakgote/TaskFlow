@@ -10,3 +10,9 @@ class ProjectCreateView(CreateView):
     form_class = ProjectForm
     template_name = 'projects/project_create.html'
     success_url = reverse_lazy("accounts:dashboard")
+
+    def form_valid(self, form):
+        project = form.save(commit=False)
+        project.owner = self.request.user
+        project.save()
+        return super().form_valid(form)
