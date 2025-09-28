@@ -3,17 +3,9 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 import uuid
 from teams.models import Team
+from .utils import STATUS_CHOICES,PRIORITY_CHOICES
 
-STATUS_CHOICES = [
-    ('To Do', 'To Do'),
-    ('In Progress', 'In Progress'),
-    ('Completed', 'Completed'),
-]
-PRIORITY_CHOICES = [
-    ('Low', 'Low'),
-    ('Medium', 'Medium'),
-    ('High', 'High'),
-]
+# Create your models here.
 
 class ProjectQuerySet(models.QuerySet):
     def active(self):
@@ -35,6 +27,7 @@ class Project(models.Model):
     team = models.ForeignKey(Team, on_delete=models.SET_NULL, null=True, related_name='projects')
     name=models.CharField(max_length=255)
     description=models.TextField(blank=True,null=True)
+    client_company = models.CharField(max_length=100, blank=True, null=True)
     status=models.CharField(max_length=20,choices=STATUS_CHOICES,default='To Do')
     priority=models.CharField(max_length=20,choices=PRIORITY_CHOICES,default='Medium')
     start_date=models.DateField()
