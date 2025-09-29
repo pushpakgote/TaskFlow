@@ -22,15 +22,7 @@
         <div class="card-body">
           <div class="form-group">
             <label for="inputName">Project Name</label>
-            
             {{ form.name|as_crispy_field }}
-            
-            {% comment %} <input type="text" name="name" class="textinput form-control" required id="id_name"> {% endcomment %}
-            {% comment %} {{ form.name.label_tag }}
-            {{ form.name }}
-            {{ form.name.help_text }}
-            {{ form.name.errors }} {% endcomment %}
-            {% comment %} {{ form.name|as_crispy_field }} {% endcomment %}
           </div>
 
           <div class="form-group">

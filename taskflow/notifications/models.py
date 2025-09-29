@@ -3,17 +3,14 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
-
 # Create your models here.
 class NotificationManager(models.Manager):
-    def for_user(self,user):
-        return self.filter(recipient=user)
     
-    def unread(self,user):
-        return self.for_user(user).filter(read=False)
+    def unread(self):
+        return self.filter(read=False)
     
-    def read(self,user):
-        return self.for_user(user).filter(read=True)
+    def read(self):
+        return self.filter(read=True)
     
 
 class Notification(models.Model):
