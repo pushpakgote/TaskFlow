@@ -51,7 +51,7 @@
             
             <div class="dropdown-divider"></div>
             <a href="#" class="dropdown-item">
-              <i class="fas fa-envelope mr-2"></i> {{notification.verb | truncatechars:25}}
+              <i class="fas fa-envelope mr-2"></i> {{notification.verb | truncatechars:15}}
               <span class="float-right text-muted text-sm">{{notification.created_at | timesince}}</span>
             </a>
           {% endfor %}
