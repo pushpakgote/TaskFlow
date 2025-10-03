@@ -14,7 +14,8 @@ class DashBoardView(View):
 
         context = {
             'latest_projects': latest_projects[:5],
-            'latest_tasks': latest_tasks[:5],
+            'projects_near_due_date': latest_projects.due_in_two_days_or_less()[:5],
+            # 'latest_tasks': latest_tasks[:5],
             'latest_members': latest_members[:8],
         }
         if request.user.is_authenticated:
@@ -23,7 +24,7 @@ class DashBoardView(View):
             context['notification_count'] = latest_notifications.count()
         
         context['latest_projects_count'] = latest_projects.count()
-        context['latest_tasks_count'] = latest_tasks.count()
+        # context['latest_tasks_count'] = latest_tasks.count()
         context['latest_members_count'] = latest_members.count()
         context['latest_teams_count'] = Team.objects.all().count()
         context["header_text"] = "Dashboard"

@@ -14,6 +14,12 @@ class ProjectQuerySet(models.QuerySet):
     def upcomming(self):
         return self.filter(due_date__gte=timezone.now())
     
+    def due_in_two_days_or_less(self):
+        today = timezone.now().date()
+        two_days_later = today + timezone.timedelta(days=2)
+        return self.active().upcomming().filter(due_date__lte=two_days_later)
+        
+    
 class ProjectManager(models.Manager):
     def get_queryset(self):
         return ProjectQuerySet(self.model,using=self._db)
