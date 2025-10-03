@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'tempus_dominus',
     'crispy_forms',
     'crispy_bootstrap5',
+    'django_celery_beat',
 
 
     # custom apps
@@ -141,12 +142,17 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # Celery congif options
+# Command : celery -A taskflow worker -l info --pool=solo
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Kolkata'
+
+#Django celery beat schedular
+# Command : celery -A taskflow beat --loglevel=info
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

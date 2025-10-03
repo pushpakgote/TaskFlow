@@ -8,6 +8,7 @@ dependencies = [
     "celery>=5.5.3",
     "crispy-bootstrap5>=2025.6",
     "django>=5.2.6",
+    "django-celery-beat>=2.8.1",
     "django-crispy-forms>=2.4",
     "django-tempus-dominus>=5.1.2.17",
     "ipython>=8.37.0",

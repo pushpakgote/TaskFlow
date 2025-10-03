@@ -20,9 +20,9 @@ class ProjectQuerySet(models.QuerySet):
         return self.active().upcomming().filter(due_date__lte=two_days_later)
         
     
-class ProjectManager(models.Manager):
-    def get_queryset(self):
-        return ProjectQuerySet(self.model,using=self._db)
+class ProjectManager(models.Manager.from_queryset(ProjectQuerySet)):
+    # def get_queryset(self):
+    #     return ProjectQuerySet(self.model,using=self._db)
     
     def all(self):
         return self.get_queryset().active().upcomming()
