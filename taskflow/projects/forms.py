@@ -18,16 +18,9 @@ class ProjectForm(forms.ModelForm):
             attrs={'class':'form-control','placeholder':'Enter project name'}
         ),
         label=False,
-        required=False
+        required=True,
+        strip=True
     )
-    # owner = forms.ModelChoiceField(
-    #     queryset=User.objects.filter(is_active=True),
-    #     widget=forms.Select(
-    #         attrs={'class':'form-control'}
-    #     ),
-    #     label=False,
-    #     required=True
-    # )
     team = forms.ModelChoiceField(
         queryset=Team.objects.all(),
         widget=forms.Select(

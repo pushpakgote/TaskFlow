@@ -13,12 +13,11 @@ class ProjectCreateView(CreateView):
     success_url = reverse_lazy("accounts:dashboard")
 
     def get_context_data(self, **kwargs):
-        if self.request.user.is_authenticated:
-            context = super().get_context_data(**kwargs)
-            latest_notifications = self.request.user.notifications.unread()
-            context['latest_notifications'] = latest_notifications[:5]
-            context['notification_count'] = latest_notifications.count()
-            context["header_text"] = "Project Add"
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread()
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Project Add"
         return context
 
     def form_valid(self, form):

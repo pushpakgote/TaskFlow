@@ -18,10 +18,10 @@ class DashBoardView(View):
             # 'latest_tasks': latest_tasks[:5],
             'latest_members': latest_members[:8],
         }
-        if request.user.is_authenticated:
-            latest_notifications = request.user.notifications.unread()
-            context['latest_notifications'] = latest_notifications[:5]
-            context['notification_count'] = latest_notifications.count()
+        
+        latest_notifications = request.user.notifications.unread()
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
         
         context['latest_projects_count'] = latest_projects.count()
         # context['latest_tasks_count'] = latest_tasks.count()
