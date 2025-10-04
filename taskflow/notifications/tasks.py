@@ -11,8 +11,7 @@ def create_notification(actor_username, verb, object_id):
         actor = User.objects.get(username=actor_username)
         content_type = ContentType.objects.get_for_model(Project)
         project = Project.objects.get(id=object_id)
-
-        members=project.team.members.all()
+        members=project.team.members.exclude(id=actor.id)
         for recipient in members:
             notification=Notification.objects.create(actor=actor, recipient=recipient, verb=verb, content_type=content_type, object_id=object_id, content_object=project, read=False)
             

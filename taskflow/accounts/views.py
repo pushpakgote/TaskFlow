@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import View
+from django.views.generic import View,ListView
 from projects.models import Project
 from tasks.models import Task
 from .models import Profile
@@ -19,7 +19,7 @@ class DashBoardView(View):
             'latest_members': latest_members[:8],
         }
         
-        latest_notifications = request.user.notifications.unread()
+        latest_notifications = request.user.notifications.unread(self.request.user)
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         
@@ -28,6 +28,27 @@ class DashBoardView(View):
         context['latest_members_count'] = latest_members.count()
         context['latest_teams_count'] = Team.objects.all().count()
         context["header_text"] = "Dashboard"
-
-
+        context["title"] = "Dashboard"
         return render(request, 'accounts/dashboard.html', context)
+
+class MemberListView(ListView):
+    model = Profile
+    context_object_name = 'members'
+    template_name = 'accounts/profile_list.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Members"
+        context["title"] = "All Members"
+        return context
+    
+    def get_queryset(self):
+        filter = self.kwargs.get('filter')
+        if filter == 'near-due-date':
+            return Project.objects.due_in_two_days_or_less()
+        
+        return super().get_queryset()

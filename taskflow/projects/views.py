@@ -14,10 +14,11 @@ class ProjectCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        latest_notifications = self.request.user.notifications.unread()
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Project Add"
+        context["title"] = "Project Add"
         return context
 
     def form_valid(self, form):
@@ -41,10 +42,11 @@ class ProjectListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        latest_notifications = self.request.user.notifications.unread()
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Projects"
+        context["title"] = "All Projects"
         return context
     
     def get_queryset(self):
