@@ -133,7 +133,7 @@
           <!-- /.card-body -->
           <div class="card-footer clearfix">
            
-            <a href="./pages/examples/projects.html" class="btn btn-sm btn-secondary float-right">View All Projects</a>
+            <a href="{% url 'projects:list' %}" class="btn btn-sm btn-secondary float-right">View All Projects</a>
           </div>
           <!-- /.card-footer -->
         </div>
@@ -239,7 +239,7 @@
           <!-- /.card-body -->
           <div class="card-footer clearfix">
            
-            <a href="./pages/examples/projects.html" class="btn btn-sm btn-secondary float-right">View All Projects</a>
+            <a href="{% url 'projects:list_filtered' 'near-due-date' %}"class="btn btn-sm btn-secondary float-right">View All Projects</a>
           </div>
           <!-- /.card-footer -->
         </div>

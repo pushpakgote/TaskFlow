@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView,ListView
 from .models import Project
 from .forms import ProjectForm
 from notifications.tasks import create_notification
@@ -32,3 +32,27 @@ class ProjectCreateView(CreateView):
         create_notification.delay(actor_username=actor_username, verb=verb, object_id=object_id)
 
         return super().form_valid(form)
+    
+class ProjectListView(ListView):
+    model = Project
+    context_object_name = 'projects'
+    template_name = 'projects/project_list.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread()
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Projects"
+        return context
+    
+    def get_queryset(self):
+        filter = self.kwargs.get('filter')
+        if filter == 'near-due-date':
+            return Project.objects.due_in_two_days_or_less()
+        
+        return super().get_queryset()
+    
+
+        
