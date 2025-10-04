@@ -8,7 +8,7 @@ from django.utils.timesince import timesince
 from django.utils import timezone
 from datetime import timedelta,datetime
 import os
-
+from phonenumber_field.modelfields import PhoneNumberField
 
 def profile_image_path_location(instance, filename):
     todays_date = datetime.now().strftime('%Y-%m-%d')
@@ -16,8 +16,10 @@ def profile_image_path_location(instance, filename):
 
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
+    job_title = models.CharField(max_length=255,blank=True,null=True)
     profile_picture = models.ImageField(upload_to=profile_image_path_location,blank=True,null=True)
     bio = models.TextField(blank=True,null=True)
+    phone_number = PhoneNumberField(blank=True,null=True,unique=True)
     location = models.CharField(max_length=255,blank=True,null=True)
     date_of_birth = models.DateField(blank=True,null=True)
     join_date = models.DateField(auto_now_add=True)

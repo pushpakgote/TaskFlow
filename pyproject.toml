@@ -10,6 +10,7 @@ dependencies = [
     "django>=5.2.6",
     "django-celery-beat>=2.8.1",
     "django-crispy-forms>=2.4",
+    "django-phonenumber-field[phonenumbers]>=8.2.0",
     "django-tempus-dominus>=5.1.2.17",
     "ipython>=8.37.0",
     "pillow>=11.3.0",

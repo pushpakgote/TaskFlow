@@ -35,3 +35,7 @@ class Notification(models.Model):
     @property
     def notification_time_formatted(self):
         return self.created_at.strftime("%d %b %I:%M %p")
+    
+    def mark_as_read(self):
+        self.read = True
+        self.save()

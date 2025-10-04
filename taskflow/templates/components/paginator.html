@@ -1,0 +1,49 @@
+{% comment %} Pagination {% endcomment %}
+{% comment %} <div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }} ">Previous</a>
+        {% endif %}
+        <span class="current">
+            Page {{ page_obj.number }} of {{page_obj.paginator.num_pages}}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }} ">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+        {% endif %}
+    </span>
+</div> {% endcomment %}
+
+<div class="card-footer">
+    <nav aria-label="Contacts Page Navigation">
+        <ul class="pagination justify-content-center m-0">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1" style="color: white;">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="color: white;">Prev</a>
+                </li>
+            {% endif %}
+
+            {# Show 1 pages before and after current page #}
+            {% for num in page_obj.paginator.page_range %}
+                {% if num >= page_obj.number|add:"-1" and num <= page_obj.number|add:"1" %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}" style="color: white;">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="color: white;">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="color: white;">Last</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>

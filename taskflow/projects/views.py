@@ -18,6 +18,7 @@ class ProjectCreateView(CreateView):
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Project Add"
+        context["title"] = "Project Add"
         return context
 
     def form_valid(self, form):
@@ -45,6 +46,7 @@ class ProjectListView(ListView):
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Projects"
+        context["title"] = "All Projects"
         return context
     
     def get_queryset(self):
