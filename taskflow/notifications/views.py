@@ -1,6 +1,9 @@
 from django.shortcuts import redirect
 from django.views.generic import ListView
 from .models import Notification
+from django.shortcuts import redirect
+from django.views.generic import ListView
+from .models import Notification
 
 # Create your views here.
 class NotificationListView(ListView):

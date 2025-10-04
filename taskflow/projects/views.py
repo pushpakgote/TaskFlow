@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from django.views.generic import CreateView,ListView
+from django.views.generic import CreateView,ListView,DetailView
 from .models import Project
 from .forms import ProjectForm
 from notifications.tasks import create_notification
@@ -37,7 +37,7 @@ class ProjectCreateView(CreateView):
 class ProjectListView(ListView):
     model = Project
     context_object_name = 'projects'
-    template_name = 'projects/project_list.html'
+    template_name = 'projects/project_details.html'
     paginate_by = 10
 
     def get_context_data(self, **kwargs):
@@ -57,4 +57,18 @@ class ProjectListView(ListView):
         return super().get_queryset()
     
 
-        
+class ProjectDetailView(DetailView):
+    model=Project
+    template_name = 'projects/project_detail.html'
+    context_object_name = 'project'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Project Details"
+        context["title"] = self.get_object().name
+        context["my_company"] = "TaskFlow"
+        context["my_company_description"] = "TaskFlow is an open source project management system."
+        return context

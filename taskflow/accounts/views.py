@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import View,ListView
+from django.views.generic import View,ListView
 from projects.models import Project
 from tasks.models import Task
 from .models import Profile
@@ -28,6 +29,7 @@ class DashBoardView(View):
         context['latest_members_count'] = latest_members.count()
         context['latest_teams_count'] = Team.objects.all().count()
         context["header_text"] = "Dashboard"
+        context["title"] = "Dashboard"
         context["title"] = "Dashboard"
         return render(request, 'accounts/dashboard.html', context)
 
