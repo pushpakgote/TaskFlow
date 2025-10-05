@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import CreateView,ListView,DetailView
+from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
 from .models import Project
 from .forms import ProjectForm
 from notifications.tasks import create_notification
+from comments.models import Comment
+from comments.forms import CommentForm
 
 # Create your views here.
 class ProjectCreateView(CreateView):
@@ -29,8 +34,7 @@ class ProjectCreateView(CreateView):
         #Send notification
         actor_username = self.request.user.username
         verb = f"New Project Assigned, { project.name }"
-        object_id = project.id
-        create_notification.delay(actor_username=actor_username, verb=verb, object_id=object_id)
+        create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
 
         return super().form_valid(form)
     
@@ -65,10 +69,47 @@ class ProjectDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         latest_notifications = self.request.user.notifications.unread(self.request.user)
+        project = self.get_object()
+        
+        # comments
+        comments = Comment.objects.filter_by_instance(project)
+        paginator = Paginator(comments, 10)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Project Details"
-        context["title"] = self.get_object().name
+        context["title"] = project.name
         context["my_company"] = "TaskFlow"
         context["my_company_description"] = "TaskFlow is an open source project management system."
-        return context 
+        context["comments"] = comments
+        context["page_obj"] = page_obj
+        context['comments_count'] = comments.count()
+        context['comment_form'] = CommentForm()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        project = self.get_object()
+        if request.user in project.team.members.all():
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.content_object = project
+                comment.save()
+
+                #Send notification
+                actor_username = request.user.username
+                actor_fullname = request.user.profile.full_name
+                verb = f"{actor_fullname} commented on { project.name }"
+                create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
+
+                messages.success(request, 'Comment added successfully.')
+            else:
+                messages.warning(request, form.errors.get("comment", ["Failed to add comment. Please try again."])[0])
+        else:
+            messages.warning(request, 'Only team members can add comments to this project.')
+        
+        
+        return redirect('projects:project-detail', pk=project.id)  # or use Super().get(request, *args, **kwargs)

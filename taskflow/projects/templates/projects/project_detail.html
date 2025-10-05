@@ -60,8 +60,8 @@
   <!-- comments -->      
           <div class="row">
             <div class="col-12">
-              <h4>Recent Comments({{ comments_count }})</h4>
-            <form action="{% url "projects:project-detail" project.pk %}" method="post">
+              <h4>Recent Comments ({{ comments_count }})</h4>
+            <form action="{% url 'projects:project-detail' project.pk %}" method="post">
               {% csrf_token %}
               <div class="col-10">
               {{ comment_form|crispy }}
@@ -89,7 +89,7 @@
             
             {% endif %}
 
-            {% for comment in page_obj %}
+            {% for comment in comments %}
                 <div class="post">
                   <div class="user-block">
                     <img class="img-circle img-bordered-sm" src="{{ comment.user.profile.profile_picture_url }}" alt="user image">

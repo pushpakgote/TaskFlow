@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'tasks',
     'notifications',
     'teams',
+    'comments',
 ]
 
 MIDDLEWARE = [
