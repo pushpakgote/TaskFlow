@@ -71,4 +71,4 @@ class ProjectDetailView(DetailView):
         context["title"] = self.get_object().name
         context["my_company"] = "TaskFlow"
         context["my_company_description"] = "TaskFlow is an open source project management system."
-        return context
+        return context 
