@@ -5,7 +5,7 @@ from django.views.generic import CreateView,ListView,DetailView
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
 from .models import Project
-from .forms import ProjectForm
+from .forms import ProjectForm,AttachmentForm
 from notifications.tasks import create_notification
 from comments.models import Comment
 from comments.forms import CommentForm
@@ -87,29 +87,62 @@ class ProjectDetailView(DetailView):
         context["page_obj"] = page_obj
         context['comments_count'] = comments.count()
         context['comment_form'] = CommentForm()
+        context['attachment_form'] = AttachmentForm()
         return context
     
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         if request.user in project.team.members.all():
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                comment = form.save(commit=False)
-                comment.user = request.user
-                comment.content_object = project
-                comment.save()
+            if "comment_submit" in request.POST:
+                form = CommentForm(request.POST)
+                if form.is_valid():
+                    comment = form.save(commit=False)
+                    comment.user = request.user
+                    comment.content_object = project
+                    comment.save()
 
-                #Send notification
-                actor_username = request.user.username
-                actor_fullname = request.user.profile.full_name
-                verb = f"{actor_fullname} commented on { project.name }"
-                create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
+                    #Send notification
+                    actor_username = request.user.username
+                    actor_fullname = request.user.profile.full_name
+                    verb = f"{actor_fullname} commented on { project.name }"
+                    create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
 
-                messages.success(request, 'Comment added successfully.')
-            else:
-                messages.warning(request, form.errors.get("comment", ["Failed to add comment. Please try again."])[0])
+                    messages.success(request, 'Comment added successfully.')
+                else:
+                    messages.warning(request, form.errors.get("comment", ["Failed to add comment. Please try again."])[0])
+
+            if "attachment_submit" in request.POST:
+                attachment_form = AttachmentForm(request.POST, request.FILES)
+                if attachment_form.is_valid():
+                    attachment = attachment_form.save(commit=False)
+                    attachment.user = request.user
+                    attachment.project = project
+                    attachment.save()
+                    messages.success(request, 'Attachment added successfully.')
+                else:
+                    messages.warning(request, attachment_form.errors.get("file", ["Failed to add attachment. Please try again."])[0])
+
+
         else:
             messages.warning(request, 'Only team members can add comments to this project.')
         
         
         return redirect('projects:project-detail', pk=project.id)  # or use Super().get(request, *args, **kwargs)
+    
+class KanbanBoardView(DetailView):
+    model=Project
+    template_name = 'projects/kanbanboard.html'
+    context_object_name = 'project'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        project = self.get_object()
+        
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Kanban Board"
+        context["title"] = f"{project.name} Kanban Board"
+        context["is_kanban"]=True
+        return context
+    

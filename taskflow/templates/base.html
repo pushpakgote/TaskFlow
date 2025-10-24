@@ -17,7 +17,7 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="{% static "dist/img/AdminLTELogo.png" %}" alt="AdminLTELogo" height="60" width="60">
+    <img class="animation__wobble" src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTELogo" height="60" width="60">
   </div>
 
   <!-- Navbar -->
@@ -28,7 +28,7 @@
  {% include "components/sidebar.html" %}
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+  <div class="content-wrapper {% if is_kanban %} kanban {% endif %}">
     <!-- Content Header (Page header) -->
     {% include 'components/header_content.html' %}
     <!-- /.content-header -->

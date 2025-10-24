@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 import uuid
 from teams.models import Team
 from .utils import STATUS_CHOICES,PRIORITY_CHOICES
+from datetime import timedelta,datetime
+import os
 
 # Create your models here.
 
@@ -79,8 +81,6 @@ class Project(models.Model):
             return 'primary'
         else:
             return ''
-    
-
 
     def priority_color(self):
         if self.priority == 'Low':
@@ -89,3 +89,23 @@ class Project(models.Model):
             return 'warning'
         else:
             return 'danger'
+        
+def project_attachment_path_location(instance, filename):
+    todays_date = datetime.now().strftime('%Y-%m-%d')
+    return f"attachments/{instance.project.name}/{todays_date}/{filename}"
+
+class Attachments(models.Model):
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,related_name='attachments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to=project_attachment_path_location)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
+
+    def __str__(self):
+        return f"Attachment by {self.user.username} for {self.project.name}"
+
+    class Meta:
+        ordering = ['-uploaded_at']
