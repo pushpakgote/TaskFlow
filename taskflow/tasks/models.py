@@ -5,6 +5,7 @@ import uuid
 from projects.models import Project
 
 STATUS_CHOICES = [
+    ('Backlog', 'Backlog'),
     ('To Do', 'To Do'),
     ('In Progress', 'In Progress'),
     ('Completed', 'Completed'),
@@ -20,7 +21,7 @@ class TaskQuerySet(models.QuerySet):
         return self.filter(active=True)
     
     def upcomming(self):
-        return self.filter(due_date__gte=timezone.now())
+        return self.filter(models.Q(due_date__gte=timezone.now()) | models.Q(due_date__isnull=True))
     
 class TaskManager(models.Manager):
     def get_queryset(self):
@@ -35,10 +36,10 @@ class Task(models.Model):
     name=models.CharField(max_length=255)
     project=models.ForeignKey(Project,on_delete=models.CASCADE,related_name='tasks')
     description=models.TextField(blank=True,null=True)
-    status=models.CharField(max_length=20,choices=STATUS_CHOICES,default='To Do')
+    status=models.CharField(max_length=20,choices=STATUS_CHOICES,default='Backlog')
     priority=models.CharField(max_length=20,choices=PRIORITY_CHOICES,default='Medium')
-    start_date=models.DateField()
-    due_date=models.DateField()
+    start_date=models.DateField(null=True,blank=True)
+    due_date=models.DateField(null=True,blank=True)
     active=models.BooleanField(default=True)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

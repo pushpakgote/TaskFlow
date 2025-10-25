@@ -36,12 +36,13 @@
         </h3>
 
         {% comment %} Task creation form  {% endcomment %}
-        {% comment %} <form id="create-task-form" data-project-id="{{ project.id}}" method="POST" action="{% url 'tasks:create-task-ajax' %}">
+        <form id="create-task-form" data-project-id="{{ project.id}}" method="POST" action="{% url 'tasks:create-task-ajax' %}">
           {% csrf_token %}
           <div class="form-group">
             <input type="text" id="task-name" name="name" class="form-control task-input" placeholde="New Task">
           </div>
-        </form> {% endcomment %}
+        </form>
+        
       </div>
       <div class="card-body task-list">
 
@@ -160,36 +161,36 @@
     columns.forEach(column => {
       column.addEventListener('dragover', (e) => {
         e.preventDefault();
+        });
 
-        column.addEventListener('drop', (e) => {
-          const taskId = e.dataTransfer.getData('text/plain');
-          const taskCard = document.querySelector(`[ data-task-id="${taskId}"]`);
+      column.addEventListener('drop', (e) => {
+        const taskId = e.dataTransfer.getData('text/plain');
+        const taskCard = document.querySelector(`[ data-task-id="${taskId}"]`);
 
-          //get new status
-          const newStatus = column.id.replace('-', ' ');
-          
+        //get new status
+        const newStatus = column.id.replace('-', ' ');
+        
 
-          //move the task card to the new column
-          column.querySelector('.task-list').prepend(taskCard);
+        //move the task card to the new column
+        column.querySelector('.task-list').prepend(taskCard);
 
-          //update the class or color based on column
-          taskCard.classList.remove('card-primary', 'card-secondary', 'card-light', 'card-success');
-          if(column.id === 'backlog'){
-            taskCard.classList.add('card-secondary');
-          } else if (column.id === 'to-do'){
-            taskCard.classList.add('card-primary');
-          } else if ( column.id === 'in-progress'){
-            taskCard.classList.add('card-primary');
-          }else if (column.id === 'completed'){
-            taskCard.classList.add('card-success');
+        //update the class or color based on column
+        taskCard.classList.remove('card-primary', 'card-secondary', 'card-light', 'card-success');
+        if(column.id === 'backlog'){
+          taskCard.classList.add('card-secondary');
+        } else if (column.id === 'to-do'){
+          taskCard.classList.add('card-primary');
+        } else if ( column.id === 'in-progress'){
+          taskCard.classList.add('card-primary');
+        }else if (column.id === 'completed'){
+          taskCard.classList.add('card-success');
+        }
+        
 
-          }
-          
-
-          //send ajax request to update task status
-          updateTaskStatus(taskId, newStatus);
-        })
-      });
+        //send ajax request to update task status
+        updateTaskStatus(taskId, newStatus);
+      })
+      
     })
 
     //update status ajax

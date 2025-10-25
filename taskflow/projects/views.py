@@ -144,5 +144,11 @@ class KanbanBoardView(DetailView):
         context["header_text"] = "Kanban Board"
         context["title"] = f"{project.name} Kanban Board"
         context["is_kanban"]=True
+        
+        #Seperate tasks by status
+        context['backlog_tasks'] = project.tasks.filter(status='Backlog').upcomming()
+        context['todo_tasks'] = project.tasks.filter(status='To Do').upcomming()
+        context['in_progress_tasks'] = project.tasks.filter(status='In Progress').upcomming()
+        context['completed_tasks'] = project.tasks.filter(status='Completed').upcomming()
         return context
     
