@@ -9,6 +9,7 @@ from .forms import ProjectForm,AttachmentForm
 from notifications.tasks import create_notification
 from comments.models import Comment
 from comments.forms import CommentForm
+from tasks.forms import TaskUpdateForm
 
 # Create your views here.
 class ProjectCreateView(CreateView):
@@ -150,5 +151,6 @@ class KanbanBoardView(DetailView):
         context['todo_tasks'] = project.tasks.filter(status='To Do').upcomming()
         context['in_progress_tasks'] = project.tasks.filter(status='In Progress').upcomming()
         context['completed_tasks'] = project.tasks.filter(status='Completed').upcomming()
+        context['form'] = TaskUpdateForm()
         return context
     

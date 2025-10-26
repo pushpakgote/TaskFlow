@@ -138,6 +138,7 @@
     </div>
   </div>
 
+  {% include "tasks/task_update_modal.html" %}
 
 {% endblock  %}
 
@@ -146,6 +147,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+
 
     const taskCards = document.querySelectorAll('.task-card');
     taskCards.forEach(card => {
@@ -317,10 +319,29 @@
     //calling update task counter on page load
     updateTaskCounters();
 
-  
+    const editIcons = document.querySelectorAll('.fa-pen');
+    let currentTaskId = null;
+    editIcons.forEach(icon => {
+     icon.addEventListener('click', function (event) {
+       event.stopPropagation();
+       
+        // get task id
+        currentTaskId = this.closest('.task-card').dataset.taskId;
+        //alert(currentTaskId);
+        
+        $('#taskUpdateModal').modal('show');
+
+     
+     
+      });
+    });
+    
+    
 
 
   });
+  
+  
 
 </script>
 
