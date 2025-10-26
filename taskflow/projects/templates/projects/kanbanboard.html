@@ -48,7 +48,7 @@
 
         {% for task in backlog_tasks %}
             <div class="card card-secondary card-outline task-card" data-task-id="{{ task.id}}">
-            <div class="card-header">
+              <div class="card-header">
                 <h5 class="card-title">{{ task.name }}</h5>
                 <div class="card-tools">
                 <a href="#" class="btn btn-tool btn-link task-counter"></a>
@@ -56,7 +56,17 @@
                     <i class="fas fa-pen"></i>
                 </a>
                 </div>
-            </div>         
+              </div>
+
+              {% comment %} task description {% endcomment %}
+              {% if task.description %}
+                <div class="card-body">
+                <p class="card-description">
+                  {{task.description}}
+                </p>
+              </div>
+              {% endif %}
+                
             </div>
         {% endfor %}
 
@@ -83,6 +93,14 @@
               </a>
             </div>
           </div>
+          {% comment %} task description {% endcomment %}
+              {% if task.description %}
+                <div class="card-body">
+                <p class="card-description">
+                  {{task.description}}
+                </p>
+              </div>
+              {% endif %}
         </div>
         {% endfor %}
       </div>
@@ -108,6 +126,14 @@
               </a>
             </div>
           </div>
+          {% comment %} task description {% endcomment %}
+              {% if task.description %}
+                <div class="card-body">
+                <p class="card-description">
+                  {{task.description}}
+                </p>
+              </div>
+              {% endif %}
         
         </div>
         {% endfor %}
@@ -132,6 +158,14 @@
               </a>
             </div>
           </div>
+          {% comment %} task description {% endcomment %}
+              {% if task.description %}
+                <div class="card-body">
+                <p class="card-description">
+                  {{task.description}}
+                </p>
+              </div>
+              {% endif %}
         </div>
         {% endfor %}
       </div>
@@ -170,8 +204,7 @@
         const taskCard = document.querySelector(`[ data-task-id="${taskId}"]`);
 
         //get new status
-        const newStatus = column.id.replace('-', ' ');
-        
+        const newStatus = column.id.replace('-', ' ');        
 
         //move the task card to the new column
         column.querySelector('.task-list').prepend(taskCard);
@@ -191,6 +224,9 @@
 
         //send ajax request to update task status
         updateTaskStatus(taskId, newStatus);
+
+        updateTaskCounters();
+
       })
       
     })
@@ -319,29 +355,98 @@
     //calling update task counter on page load
     updateTaskCounters();
 
-    const editIcons = document.querySelectorAll('.fa-pen');
+    const taskUpdateModal = document.getElementById('taskUpdateModal');
     let currentTaskId = null;
-    editIcons.forEach(icon => {
-     icon.addEventListener('click', function (event) {
-       event.stopPropagation();
-       
-        // get task id
-        currentTaskId = this.closest('.task-card').dataset.taskId;
-        //alert(currentTaskId);
+    document.addEventListener('click', function (event) {
+      const penIcon = event.target.closest('.fa-pen');
+      if (!penIcon) return; // only handle pen icon clicks
+
+      event.stopPropagation();
+      const currentTaskCard = penIcon.closest('.task-card');
+      currentTaskId = currentTaskCard.dataset.taskId;
+      const taskUpdateModal = document.getElementById('taskUpdateModal');
         
         $('#taskUpdateModal').modal('show');
 
-     
-     
-      });
-    });
-    
-    
+        //Get task data from database
+        fetch(`/tasks/${currentTaskId}/get` , {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }).then(response => response.json())
+        .then(data => {
+          if (data.error){
+            console.error(data.error);
+          }else{
+            task = data.task;
+            console.log(data.task);
 
+            //setting data into forms fields
+            taskUpdateModal.querySelector('input[name="task_id"]').value = task.id;
+            taskUpdateModal.querySelector('input[name="name"]').value = task.name;
+            taskUpdateModal.querySelector('textarea[name="description"]').value = task.description;
+            taskUpdateModal.querySelector('select[name="priority"]').value = task.priority;
+            taskUpdateModal.querySelector('input[name="start_date"]').value = task.start_date;
+            taskUpdateModal.querySelector('input[name="due_date"]').value = task.due_date;
+
+            //$('#taskUpdateModal').modal('show');
+
+          }
+          
+        })
+        .catch(error => console.error('Error:', error));
+      })
+    
+    //Update task
+    const taskUpdateForm = document.getElementById('taskUpdateForm');
+    taskUpdateForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      const formData = new FormData(taskUpdateForm);
+      fetch(`/tasks/${currentTaskId}/update`, {
+        method: 'POST',
+        body: formData,
+        headers:{
+          'x-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+          
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.success){
+          const taskCard = document.querySelector(`.task-card[data-task-id="${currentTaskId}"]`);
+
+          if(taskCard){
+            taskCard.querySelector('.card-title').textContent = data.task.name;
+            
+            let descriptionElement = taskCard.querySelector('.card-description');
+            if(descriptionElement){
+              descriptionElement.textContent = data.task.description;
+            }else if(data.task.description){
+              const cardBody = document.createElement('div');
+              cardBody.classList.add('card-body');
+              taskCard.appendChild(cardBody);
+              descriptionElement = document.createElement('p');
+              descriptionElement.classList.add('card-description');
+              descriptionElement.textContent = data.task.description;
+              cardBody.appendChild(descriptionElement);
+              
+            }
+          }else {
+            console.error('Task card not found , task id:', currentTaskId);
+          }
+          
+          console.log('Task updated successfully');
+          $('#taskUpdateModal').modal('hide');
+        }else{
+          console.error('Error updating task:', data.error);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+
+    });
 
   });
-  
-  
 
 </script>
 
