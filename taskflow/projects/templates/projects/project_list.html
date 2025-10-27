@@ -87,11 +87,16 @@
                               </i>
                               Edit
                           </a>
-                          <a class="btn btn-danger btn-sm" href="#">
+                          
+                          {% if request.user == project.owner %}
+                            <a class="btn btn-danger btn-sm" href="{% url 'projects:delete' project.pk %}?next={{ request.path }}">
                               <i class="fas fa-trash">
                               </i>
                               Delete
-                          </a>
+                            </a>
+                          {% endif %}
+                            
+                          
                       </td>
                   </tr>
 

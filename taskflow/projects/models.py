@@ -20,6 +20,9 @@ class ProjectQuerySet(models.QuerySet):
         today = timezone.now().date()
         two_days_later = today + timezone.timedelta(days=2)
         return self.active().upcomming().filter(due_date__lte=two_days_later)
+    
+    def for_user(self, user):
+        return self.filter(models.Q(owner=user) | models.Q(team__members=user)).distinct()
         
     
 class ProjectManager(models.Manager.from_queryset(ProjectQuerySet)):

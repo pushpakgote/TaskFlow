@@ -9,7 +9,7 @@ from teams.models import Team
 # Create your views here.
 class DashBoardView(View):
     def get(self, request, *args, **kwargs):
-        latest_projects = Project.objects.all()
+        latest_projects = Project.objects.all().for_user(request.user)
         latest_tasks = Task.objects.all()
         latest_members = Profile.objects.all()
 
@@ -25,7 +25,7 @@ class DashBoardView(View):
         context['notification_count'] = latest_notifications.count()
         
         context['latest_projects_count'] = latest_projects.count()
-        # context['latest_tasks_count'] = latest_tasks.count()
+        context['latest_tasks_count'] = latest_tasks.count()
         context['latest_members_count'] = latest_members.count()
         context['latest_teams_count'] = Team.objects.all().count()
         context["header_text"] = "Dashboard"

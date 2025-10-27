@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import CreateView,ListView,DetailView
+from django.views.generic import CreateView,ListView,DetailView,DeleteView
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
 from .models import Project
@@ -57,10 +57,33 @@ class ProjectListView(ListView):
     def get_queryset(self):
         filter = self.kwargs.get('filter')
         if filter == 'near-due-date':
-            return Project.objects.due_in_two_days_or_less()
+            return Project.objects.for_user(self.request.user).due_in_two_days_or_less()
+        else:
+            return Project.objects.all().for_user(self.request.user)
         
-        return super().get_queryset()
+        # return super().get_queryset()
     
+class ProjectDeleteView(DeleteView):
+    model=Project
+    template_name = 'projects/confirm_delete.html'
+    success_url = reverse_lazy("projects:list")
+    context_object_name = 'project'
+
+    def get_success_url(self):
+        next_url = self.request.GET.get('next')
+        if next_url:
+            print(next_url)
+            return next_url
+        return super().get_success_url()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Project Delete"
+        context["title"] = "Project Delete"
+        return context
 
 class ProjectDetailView(DetailView):
     model=Project
