@@ -1,7 +1,8 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
+from django.http import Http404
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.views.generic import CreateView,ListView,DetailView,DeleteView
+from django.views.generic import CreateView,ListView,DetailView,DeleteView,UpdateView
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
 from .models import Project
@@ -25,6 +26,7 @@ class ProjectCreateView(CreateView):
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Project Add"
         context["title"] = "Project Add"
+        context["submit_button_text"] = "Create New Project"
         return context
 
     def form_valid(self, form):
@@ -63,6 +65,29 @@ class ProjectListView(ListView):
         
         # return super().get_queryset()
     
+class ProjectUpdateView(UpdateView):
+    model=Project
+    form_class = ProjectForm
+    template_name = 'projects/project_create.html'
+    success_url = reverse_lazy("projects:list")
+
+    def get_object(self, queryset = None):
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if project.owner != self.request.user:
+            raise Http404("You are not allowed to edit this project.")
+        return project
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Project Update"
+        context["title"] = "Project Update"
+        context["submit_button_text"] = "Update Project"
+        return context
+
 class ProjectDeleteView(DeleteView):
     model=Project
     template_name = 'projects/confirm_delete.html'
@@ -84,6 +109,17 @@ class ProjectDeleteView(DeleteView):
         context["header_text"] = "Project Delete"
         context["title"] = "Project Delete"
         return context
+    
+    def post(self, request, *args, **kwargs):
+        project = self.get_object()
+        next_url = request.GET.get('next') or self.get_success_url()
+
+        if request.user != project.owner:
+            messages.warning(request, "You are not allowed to delete this project.")
+            return redirect(next_url)
+        
+        messages.success(request, f"Project '{project.name}' deleted successfully.")
+        return super().post(request, *args, **kwargs)
 
 class ProjectDetailView(DetailView):
     model=Project

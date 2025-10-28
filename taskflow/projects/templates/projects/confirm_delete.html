@@ -10,7 +10,7 @@
 <form method="post">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn btn-secondary">Cancel</a>
+    <a href="{{ request.GET.next }}" class="btn btn-secondary">Cancel</a>
 </form>
 
 {% endblock %}

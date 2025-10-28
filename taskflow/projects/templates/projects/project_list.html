@@ -81,12 +81,13 @@
                           <span class="badge badge-{{ project.priority_color }}">{{ project.priority }}</span>
                       </td>
                       <td class="project-actions text-right">
-                         
-                          <a class="btn btn-info btn-sm" href="#">
+                         {% if request.user == project.owner %}
+                          <a class="btn btn-info btn-sm" href="{% url 'projects:update' project.id %}">
                               <i class="fas fa-pencil-alt">
                               </i>
                               Edit
                           </a>
+                          {% endif %}
                           
                           {% if request.user == project.owner %}
                             <a class="btn btn-danger btn-sm" href="{% url 'projects:delete' project.pk %}?next={{ request.path }}">
@@ -99,13 +100,21 @@
                           
                       </td>
                   </tr>
-
-                  {% endfor %}
+                {% endfor %}
 
 
 
               </tbody>
           </table>
+          {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} mb-0">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+          {% endif %}
 
        {% include "components/paginator.html" %}
 
