@@ -195,3 +195,5 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+
+ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'

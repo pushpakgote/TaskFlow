@@ -23,6 +23,9 @@ class TaskQuerySet(models.QuerySet):
     def upcomming(self):
         return self.filter(models.Q(due_date__gte=timezone.now()) | models.Q(due_date__isnull=True))
     
+    def for_user(self, user):
+        return self.filter(models.Q(owner=user) | models.Q(project__team__members=user)).distinct()
+    
 class TaskManager(models.Manager):
     def get_queryset(self):
         return TaskQuerySet(self.model,using=self._db)

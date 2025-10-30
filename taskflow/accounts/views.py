@@ -9,9 +9,18 @@ from teams.models import Team
 # Create your views here.
 class DashBoardView(View):
     def get(self, request, *args, **kwargs):
-        latest_projects = Project.objects.all().for_user(request.user)
-        latest_tasks = Task.objects.all()
-        latest_members = Profile.objects.all()
+        user = request.user
+        
+        if user.is_superuser:
+            latest_projects = Project.objects.all()
+            latest_tasks = Task.objects.all()
+            latest_members = Profile.objects.all()
+            team_count = Team.objects.all().count()
+        else:
+            latest_projects = Project.objects.all().for_user(user)
+            latest_tasks = Task.objects.all().for_user(user)
+            latest_members = Profile.objects.filter(user__teams__in=user.teams.all()).distinct()
+            team_count = user.teams.all().count()
 
         context = {
             'latest_projects': latest_projects[:5],
@@ -20,14 +29,14 @@ class DashBoardView(View):
             'latest_members': latest_members[:8],
         }
         
-        latest_notifications = request.user.notifications.unread(self.request.user)
+        latest_notifications = request.user.notifications.unread(user)
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         
         context['latest_projects_count'] = latest_projects.count()
         context['latest_tasks_count'] = latest_tasks.count()
         context['latest_members_count'] = latest_members.count()
-        context['latest_teams_count'] = Team.objects.all().count()
+        context['latest_teams_count'] = team_count
         context["header_text"] = "Dashboard"
         context["title"] = "Dashboard"
         context["title"] = "Dashboard"
@@ -49,8 +58,8 @@ class MemberListView(ListView):
         return context
     
     def get_queryset(self):
-        filter = self.kwargs.get('filter')
-        if filter == 'near-due-date':
-            return Project.objects.due_in_two_days_or_less()
-        
-        return super().get_queryset()
+        user = self.request.user
+        if user.is_superuser:
+            return Profile.objects.all()
+        else:
+            return Profile.objects.filter(user__teams__in=user.teams.all()).distinct()

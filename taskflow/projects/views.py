@@ -44,7 +44,7 @@ class ProjectCreateView(CreateView):
 class ProjectListView(ListView):
     model = Project
     context_object_name = 'projects'
-    template_name = 'projects/project_details.html'
+    template_name = 'projects/project_list.html'
     paginate_by = 10
 
     def get_context_data(self, **kwargs):
