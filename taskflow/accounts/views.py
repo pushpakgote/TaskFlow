@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import View,ListView
-from django.views.generic import View,ListView
+from django.views.generic import View,ListView,DetailView
+from django.core.paginator import Paginator
 from projects.models import Project
 from tasks.models import Task
 from .models import Profile
@@ -63,3 +63,32 @@ class MemberListView(ListView):
             return Profile.objects.all()
         else:
             return Profile.objects.filter(user__teams__in=user.teams.all()).distinct()
+        
+class ProfileDetailView(DetailView):
+    model = Profile
+    template_name = 'accounts/profile_detail.html'
+    context_object_name = 'profile'
+
+    def get_context_data(self, **kwargs):
+        profile = self.get_object()
+        context = super().get_context_data(**kwargs)
+
+        user_projects = Project.objects.all().for_user(profile.user)
+
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Profile"
+        context["title"] = f"{self.get_object().full_name}"
+
+        context['user_task_count'] = Task.objects.all().for_user(profile.user).count()
+        context['user_project_count'] = user_projects.count()
+        context['user_projects'] = user_projects
+
+        #Paginator
+        paginator = Paginator(user_projects, 10)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context['page_obj'] = page_obj
+        
+        return context

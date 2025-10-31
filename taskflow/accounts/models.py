@@ -18,6 +18,8 @@ class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
     job_title = models.CharField(max_length=255,blank=True,null=True)
     profile_picture = models.ImageField(upload_to=profile_image_path_location,blank=True,null=True)
+    education_level = models.TextField(blank=True,null=True)
+    skills = models.TextField(blank=True,null=True)
     bio = models.TextField(blank=True,null=True)
     phone_number = PhoneNumberField(blank=True,null=True,unique=True)
     location = models.CharField(max_length=255,blank=True,null=True)

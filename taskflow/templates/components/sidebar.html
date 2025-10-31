@@ -15,7 +15,7 @@
           <img src="{{ request.user.profile.profile_picture_url }}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="./pages/examples/profile.html" class="d-block">{{request.user.profile.full_name}}</a>
+          <a href="{% url 'accounts:profile-detail' request.user.profile.pk %}" class="d-block">{{request.user.profile.full_name}}</a>
         </div>
       </div>
 
