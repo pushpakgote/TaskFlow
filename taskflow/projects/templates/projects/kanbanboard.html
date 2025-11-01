@@ -52,6 +52,17 @@
                 <h5 class="card-title">{{ task.name }}</h5>
                 <div class="card-tools">
                 <a href="#" class="btn btn-tool btn-link task-counter"></a>
+                
+                  {% if task.user_assigned_to %}
+                  <a href="#" class="profile-img" >
+                    <img 
+                      src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
+                      height="20" width="20" 
+                      class="img-circle elevation-2" 
+                      alt="{{ task.user_assigned_to.profile.full_name }}">
+                    </a>
+                  {% endif %}
+                
                 <a href="#" class="btn btn-tool">
                     <i class="fas fa-pen"></i>
                 </a>
@@ -88,6 +99,15 @@
             <h5 class="card-title">{{ task.name }}</h5>
             <div class="card-tools">
               <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
+              {% if task.user_assigned_to %}
+                <a href="#" class="profile-img"></a>
+                  <img 
+                    src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
+                    height="20" width="20" 
+                    class="img-circle elevation-2" 
+                    alt="{{ task.user_assigned_to.profile.full_name }}">
+                  </a>
+                {% endif %}
               <a href="#" class="btn btn-tool">
                 <i class="fas fa-pen"></i>
               </a>
@@ -121,6 +141,15 @@
             <h5 class="card-title">{{ task.name }}</h5>
             <div class="card-tools">
               <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
+              {% if task.user_assigned_to %}
+              <a href="#" class="profile-img"></a>
+                <img 
+                  src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
+                  height="20" width="20" 
+                  class="img-circle elevation-2" 
+                  alt="{{ task.user_assigned_to.profile.full_name }}">
+                </a>
+              {% endif %}
               <a href="#" class="btn btn-tool">
                 <i class="fas fa-pen"></i>
               </a>
@@ -153,6 +182,15 @@
             <h5 class="card-title">{{ task.name }}</h5>
             <div class="card-tools">
               <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
+              {% if task.user_assigned_to %}
+              <a href="#" class="profile-user-img"></a>
+                <img 
+                  src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
+                  height="20" width="20" 
+                  class="img-circle elevation-2" 
+                  alt="{{ task.user_assigned_to.profile.full_name }}">
+                </a>
+              {% endif %}
               <a href="#" class="btn btn-tool">
                 <i class="fas fa-pen"></i>
               </a>
@@ -433,6 +471,39 @@
               cardBody.appendChild(descriptionElement);
               
             }
+
+            // --- Update or create profile image
+            const cardTools = taskCard.querySelector('.card-tools');
+            if (data.task.assigned_user_profile_img) {
+              let profileLink = cardTools.querySelector('.profile-img');
+
+              // if <a class="profile-img"> doesn’t exist, create it
+              if (!profileLink) {
+                profileLink = document.createElement('a');
+                profileLink.href = '#';
+                profileLink.classList.add('profile-img');
+                cardTools.insertBefore(profileLink, cardTools.querySelector('.fa-pen').closest('a'));  // insert before edit icon
+              }
+
+              // if <img> doesn’t exist, create it
+              let img = profileLink.querySelector('img');
+              if (!img) {
+                img = document.createElement('img');
+                img.height = 20;
+                img.width = 20;
+                img.classList.add('img-circle', 'elevation-2');
+                profileLink.appendChild(img);
+              }
+
+              // update img attributes
+              img.src = data.task.assigned_user_profile_img;
+              img.alt = data.task.assigned_user_full_name;
+            } else {
+              // if task now has no assigned user, remove old image if exists
+              const profileLink = cardTools.querySelector('.profile-img');
+              if (profileLink) profileLink.remove();
+            }
+
           }else {
             console.error('Task card not found , task id:', currentTaskId);
           }

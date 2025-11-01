@@ -78,7 +78,10 @@ def update_task(request,task_id):
                                     'priority': task.priority,
                                     'start_date': task.start_date.isoformat() if task.start_date else "",
                                     'due_date': task.due_date.isoformat() if task.due_date else "",
-                                    'assigned_to': task.user_assigned_to.id if task.user_assigned_to else ""
+                                    'assigned_to': task.user_assigned_to.id if task.user_assigned_to else "",
+
+                                    'assigned_user_profile_img': task.user_assigned_to.profile.profile_picture_url if task.user_assigned_to else "",
+                                    'assigned_user_full_name': task.user_assigned_to.profile.full_name if task.user_assigned_to else "",
                                 }})
         else:
             return JsonResponse({'success': False,'error': form.errors,'status':400})
