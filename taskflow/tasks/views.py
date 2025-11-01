@@ -3,6 +3,7 @@ from django.views.decorators.http import require_POST
 from .models import Task
 from .forms import TaskUpdateForm
 from projects.models import Project
+from accounts.models import Profile
 import json
 from django.http import JsonResponse
 
@@ -55,14 +56,19 @@ def get_task(request,task_id):
             'priority': task.priority,
             'start_date': task.start_date.isoformat() if task.start_date else "",
             'due_date': task.due_date.isoformat() if task.due_date else "",
+            'assigned_to': task.user_assigned_to.pk if task.user_assigned_to else ""
         }
         return JsonResponse({'success': True,'task': task_data})
 
 def update_task(request,task_id):
     task = get_object_or_404(Task, id=task_id)
+    # team_members=Profile.objects.filter(user__in=task.project.team.members.all())
+    print("assigned to ::::::::::",task.__dict__)
+    print("Post request ::::::::::",request.POST)
     if request.method == 'POST':
         form = TaskUpdateForm(request.POST, instance=task)
         if form.is_valid():
+            # task.user_assigned_to = form.cleaned_data['assigned_user']
             form.save()
             return  JsonResponse({'success': True,
                                   'task' : {
@@ -72,6 +78,7 @@ def update_task(request,task_id):
                                     'priority': task.priority,
                                     'start_date': task.start_date.isoformat() if task.start_date else "",
                                     'due_date': task.due_date.isoformat() if task.due_date else "",
+                                    'assigned_to': task.user_assigned_to.id if task.user_assigned_to else ""
                                 }})
         else:
             return JsonResponse({'success': False,'error': form.errors,'status':400})

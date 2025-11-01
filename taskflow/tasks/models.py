@@ -37,6 +37,7 @@ class Task(models.Model):
     owner=models.ForeignKey(User,on_delete=models.CASCADE,related_name='tasks')
     id=models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     name=models.CharField(max_length=255)
+    user_assigned_to = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True,related_name='assigned_tasks')
     project=models.ForeignKey(Project,on_delete=models.CASCADE,related_name='tasks')
     description=models.TextField(blank=True,null=True)
     status=models.CharField(max_length=20,choices=STATUS_CHOICES,default='Backlog')

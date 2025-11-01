@@ -210,6 +210,6 @@ class KanbanBoardView(DetailView):
         context['todo_tasks'] = project.tasks.filter(status='To Do').upcomming()
         context['in_progress_tasks'] = project.tasks.filter(status='In Progress').upcomming()
         context['completed_tasks'] = project.tasks.filter(status='Completed').upcomming()
-        context['form'] = TaskUpdateForm()
+        context['form'] = TaskUpdateForm(team=project.team.members.all())
         return context
     

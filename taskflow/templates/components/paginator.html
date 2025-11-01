@@ -15,15 +15,16 @@
     </span>
 </div> {% endcomment %}
 
+{% with query_name=query_name|default:"page" %}
 <div class="card-footer">
     <nav aria-label="Contacts Page Navigation">
         <ul class="pagination justify-content-center m-0">
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1" style="color: white;">First</a>
+                    <a class="page-link" href="?{{query_name}}=1" style="color: white;">First</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" style="color: white;">Prev</a>
+                    <a class="page-link" href="?{{query_name}}={{ page_obj.previous_page_number }}" style="color: white;">Prev</a>
                 </li>
             {% endif %}
 
@@ -31,19 +32,20 @@
             {% for num in page_obj.paginator.page_range %}
                 {% if num >= page_obj.number|add:"-1" and num <= page_obj.number|add:"1" %}
                     <li class="page-item {% if page_obj.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}" style="color: white;">{{ num }}</a>
+                        <a class="page-link" href="?{{query_name}}={{ num }}" style="color: white;">{{ num }}</a>
                     </li>
                 {% endif %}
             {% endfor %}
 
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" style="color: white;">Next</a>
+                    <a class="page-link" href="?{{query_name}}={{ page_obj.next_page_number }}" style="color: white;">Next</a>
                 </li>
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" style="color: white;">Last</a>
+                    <a class="page-link" href="?{{query_name}}={{ page_obj.paginator.num_pages }}" style="color: white;">Last</a>
                 </li>
             {% endif %}
         </ul>
     </nav>
 </div>
+{% endwith %}

@@ -5,6 +5,8 @@ from projects.models import Project
 from tasks.models import Task
 from .models import Profile
 from teams.models import Team
+from django.contrib.contenttypes.models import ContentType
+from comments.models import Comment
 
 # Create your views here.
 class DashBoardView(View):
@@ -75,20 +77,43 @@ class ProfileDetailView(DetailView):
 
         user_projects = Project.objects.all().for_user(profile.user)
 
+        #Paginator projects
+        paginator = Paginator(user_projects, 5)
+        page_number = self.request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        #Users comments
+        user_comments = profile.user.comments.all()
+        project_content_type = ContentType.objects.get_for_model(Project)
+        project_comments = Comment.objects.filter(content_type=project_content_type, object_id__in=[str(id) for id in user_projects.values_list('id', flat=True)])
+
+        #Paginator comments
+        comment_paginator = Paginator(project_comments, 5)
+        comment_page_number = self.request.GET.get('comment_page')
+        comment_page_obj = comment_paginator.get_page(comment_page_number)
+
+        #User tasks
+        user_tasks = Task.objects.all().for_user(profile.user)
+
+        #user tasks paginator
+        task_paginator = Paginator(user_tasks, 5)
+        task_page_number = self.request.GET.get('task_page')
+        task_page_obj = task_paginator.get_page(task_page_number)
+
+
         latest_notifications = self.request.user.notifications.unread(self.request.user)
         context['latest_notifications'] = latest_notifications[:5]
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Profile"
         context["title"] = f"{self.get_object().full_name}"
 
-        context['user_task_count'] = Task.objects.all().for_user(profile.user).count()
+        context['user_task_count'] = user_tasks.count()
+        context['tasks'] = task_page_obj
         context['user_project_count'] = user_projects.count()
         context['user_projects'] = user_projects
-
-        #Paginator
-        paginator = Paginator(user_projects, 10)
-        page_number = self.request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
         context['page_obj'] = page_obj
+        context['project_comments'] = project_comments
+        context['comments'] = comment_page_obj
+        context['all_user_comments_count'] = project_comments.count()
         
         return context
