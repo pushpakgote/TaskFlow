@@ -37,7 +37,7 @@ class ProjectCreateView(CreateView):
         #Send notification
         actor_username = self.request.user.username
         verb = f"New Project Assigned, { project.name }"
-        create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
+        create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id, content_type_model='project',content_type_app_label='projects')
 
         return super().form_valid(form)
     
@@ -165,7 +165,7 @@ class ProjectDetailView(DetailView):
                     actor_username = request.user.username
                     actor_fullname = request.user.profile.full_name
                     verb = f"{actor_fullname} commented on { project.name }"
-                    create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id)
+                    create_notification.delay(actor_username=actor_username, verb=verb, object_id=project.id, content_type_model='project',content_type_app_label='projects')
 
                     messages.success(request, 'Comment added successfully.')
                 else:

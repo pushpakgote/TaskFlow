@@ -3,7 +3,7 @@ from django.views.decorators.http import require_POST
 from .models import Task
 from .forms import TaskUpdateForm
 from projects.models import Project
-from accounts.models import Profile
+from notifications.tasks import create_notification
 import json
 from django.http import JsonResponse
 
@@ -63,13 +63,20 @@ def get_task(request,task_id):
 def update_task(request,task_id):
     task = get_object_or_404(Task, id=task_id)
     # team_members=Profile.objects.filter(user__in=task.project.team.members.all())
-    print("assigned to ::::::::::",task.__dict__)
-    print("Post request ::::::::::",request.POST)
+    # print("assigned to ::::::::::",task.__dict__)
+    # print("Post request ::::::::::",request.POST)
     if request.method == 'POST':
         form = TaskUpdateForm(request.POST, instance=task)
         if form.is_valid():
             # task.user_assigned_to = form.cleaned_data['assigned_user']
             form.save()
+
+            #Send notification
+            actor_username = request.user.username
+            task_user_profile = task.user_assigned_to.profile
+            verb = f"Task {task.name} assigned to {task_user_profile.full_name}"
+            create_notification.delay(actor_username, verb, object_id=task.id, content_type_model='task',content_type_app_label='tasks')
+
             return  JsonResponse({'success': True,
                                   'task' : {
                                     'id': str(task.id),
