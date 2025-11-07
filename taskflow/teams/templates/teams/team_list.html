@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ title }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <section class="content">
+    <div class="container-fluid">
+        
+        {% comment %}
+        <div class="row mb-3">
+            <div class="col-md-12 text-right">
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Team
+                </a>
+            </div>
+        </div>
+        {% endcomment %}
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Teams</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body p-0">
+                <table class="table table-striped projects">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%">#</th>
+                            <th style="width: 30%">Team Name</th>
+                            <th>Leader</th>
+                            <th style="width: 20%">Members</th>
+                            <th style="width: 20%" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for team in teams  %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    {% comment %} <a href="{% url 'teams:detail' team.id %}">{{team.name}}</a> {% endcomment %}
+                                    <a href="#">{{team.name}}</a>
+                                    <br/>
+                                    <small>Created at {{team.created_at|date:"d M, Y"}}</small>
+                                </td>
+                                <td>{{team.team_lead.profile.full_name}}</td>
+                                <td>
+                                    <ul class="list-inline">
+                                        
+                                        {% with team.members.all as members  %}
+                                            {% if members %}
+                                                {% for member in members|slice:":3"  %}  
+                                                    <li class="list-inline-item">
+                                                        <img alt="User1" class="table-avatar" title="{{member.profile.full_name}}"
+                                                            src="{{ member.profile.profile_picture_url }}"
+                                                            style="width: 2.5rem; height: 2.5rem; border-radius: 50%; object-fit: cover;">
+                                                    </li>
+                                                {% endfor %}
+                                                
+                                                {% if members|length > 3 %}
+                                                    <li class="list-inline-item">
+                                                        <span class="badge badge-light">+{{members|length|add:"-3"}}</span>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li class="list-inline-item text-muted">No members</li>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </ul>
+                                </td>
+                                <td class="project-actions text-right">
+                                    {% if request.user == team.team_lead %}
+                                        <a class="btn btn-info btn-sm" href="{% url 'teams:team-update' team.id %}">
+                                            <i class="fas fa-pencil-alt"></i> Edit
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" href="{% url 'teams:team-delete' team.id %}?next={{ request.path }}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.card-body -->
+             {% include 'components/paginator.html' %}
+            <!-- /.card-footer -->
+        </div>
+        <!-- /.card -->
+    </div>
+</section>
+{% endblock %}

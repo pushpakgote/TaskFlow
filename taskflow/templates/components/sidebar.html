@@ -71,8 +71,8 @@
                 </li>
 
               <!-- Tasks -->
-              <li class="nav-item">
-                <a href="#" class="nav-link">
+              <li class="nav-item  ">
+                <a href="#" class="nav-link {% if request.resolver_match.url_name == 'team-create' or request.resolver_match.url_name == 'team-list'%} active {% endif %}">
                   <i class="nav-icon fas fa-users"></i>
                   <p>
                     Teams
@@ -81,13 +81,13 @@
                 </a>
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="./pages/examples/tasks.html" class="nav-link">
+                    <a href="{% url 'teams:team-list' %}" class="nav-link {% if request.resolver_match.url_name == 'team-list' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
                       <p>All Teams</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="./pages/examples/task-add.html" class="nav-link">
+                    <a href="{% url 'teams:team-create' %}" class="nav-link {% if request.resolver_match.url_name == 'team-create' %}active{% endif %}">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Add Team</p>
                     </a>

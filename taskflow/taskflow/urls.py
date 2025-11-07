@@ -27,6 +27,7 @@ urlpatterns = [
     path('projects/', include('projects.urls', namespace='projects')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
     path('tasks/', include('tasks.urls', namespace='tasks')),
+    path('teams/', include('teams.urls', namespace='teams')),
 ]
 
 if settings.DEBUG:
