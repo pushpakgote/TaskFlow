@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -81,6 +82,8 @@ MIDDLEWARE = [
 
     #Allauth
     'allauth.account.middleware.AccountMiddleware',
+
+    'taskflow.middleware.NoCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'taskflow.urls'
@@ -195,5 +198,10 @@ ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_SIGNUP_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = '/'
+
 
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'
+
+
+
