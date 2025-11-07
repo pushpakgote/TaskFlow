@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import View,ListView,DetailView
+from django.urls import reverse
+from django.views.generic import View,ListView,DetailView,UpdateView
 from django.core.paginator import Paginator
 from projects.models import Project
 from tasks.models import Task
@@ -7,6 +8,7 @@ from .models import Profile
 from teams.models import Team
 from django.contrib.contenttypes.models import ContentType
 from comments.models import Comment
+from .forms import ProfileUpdateForm
 
 # Create your views here.
 class DashBoardView(View):
@@ -116,4 +118,21 @@ class ProfileDetailView(DetailView):
         context['comments'] = comment_page_obj
         context['all_user_comments_count'] = project_comments.count()
         
+        return context
+    
+class ProfileUpdateView(UpdateView):
+    model = Profile
+    form_class = ProfileUpdateForm
+    template_name = 'accounts/profile_update.html'
+
+    def get_success_url(self):
+        return reverse('accounts:profile-detail', kwargs={'pk': self.object.pk})
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_notifications = self.request.user.notifications.unread(self.request.user)
+        context['latest_notifications'] = latest_notifications[:5]
+        context['notification_count'] = latest_notifications.count()
+        context["header_text"] = "Profile Update"
+        context["title"] = "Profile Update"
         return context

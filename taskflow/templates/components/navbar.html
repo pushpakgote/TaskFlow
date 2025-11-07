@@ -70,8 +70,8 @@
             <span class="dropdown-item dropdown-header">Welcome, {{ request.user.profile.full_name }}</span>
             <div class="dropdown-divider"></div>
   
-                <a href="#" class="dropdown-item">
-                  <i class="fas fa-cog mr-2"></i> Settings
+                <a href="{% url 'accounts:profile-update' request.user.profile.pk %}" class="dropdown-item">
+                  <i class="fas fa-cog mr-2"></i> Edit Profile
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="{% url 'account_change_password' %}" class="dropdown-item">
