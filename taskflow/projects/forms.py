@@ -36,7 +36,7 @@ class ProjectForm(forms.ModelForm):
         ),
         label=False,
         required=True
-        )
+    )
     priority = forms.ChoiceField(
         choices=PRIORITY_CHOICES,
         widget=forms.Select(
@@ -44,21 +44,21 @@ class ProjectForm(forms.ModelForm):
         ),
         label=False,
         required=True
-        )
+    )
     client_company = forms.CharField(
         label=False,
         required=True
     )
     start_date = forms.DateField(
-        widget=DatePicker(
-            attrs={'append':'fa fa-calendar','icon_toggle':True}
+        widget=forms.TextInput(
+            attrs={'class': 'datepicker'}
         ),
         label=False,
         required=True
     )
     due_date = forms.DateField(
-        widget=DatePicker(
-            attrs={'append':'fa fa-calendar','icon_toggle':True}
+        widget=forms.TextInput(
+            attrs={'class': 'datepicker'}
         ),
         label=False,
         required=True

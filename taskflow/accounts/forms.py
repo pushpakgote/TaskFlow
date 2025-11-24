@@ -7,30 +7,30 @@ class ProfileUpdateForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={'rows': 3, 'placeholder': "Describe your educational level here ..."}
         ),
-        required=True
+        required=False
     )
 
     skills = forms.CharField(
         widget=forms.Textarea(
             attrs={'rows': 3, 'placeholder': "Describe your skills here ..."}
         ),
-        required=True
+        required=False
     )
 
     bio = forms.CharField(
         widget=forms.Textarea(
             attrs={'rows': 3, 'placeholder': "Describe your bior here ..."}
         ),
-        required=True
+        required=False
     )
 
     date_of_birth = forms.DateTimeField(
         label=False,
-        required=True,
+        required=False,
         widget=DatePicker(
             attrs = {
-                'append': 'fa fa-calendar',
-                'icon_toggle': True,
+                # 'append': 'fa fa-calendar',
+                # 'icon_toggle': True,
             }
         ),
     )

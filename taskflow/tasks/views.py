@@ -13,7 +13,7 @@ def update_task_status_ajax(request,task_id):
         task = Task.objects.get(id=task_id)
         data = json.loads(request.body)
         new_status = data.get('status').title()
-        # print(new_status)
+        print("New Status ::::::::::",new_status)
 
         if new_status in ['Backlog', 'To Do', 'In Progress', 'Completed']:
             task.status = new_status
@@ -24,24 +24,64 @@ def update_task_status_ajax(request,task_id):
     except Task.DoesNotExist:
         return JsonResponse({'success': False,'error': 'Task not found','status':404})
     
+# @require_POST
+# def create_task_ajax(request):
+#     name = request.POST.get('name')
+#     project_id = request.POST.get('project_id')
+#     user = request.user
+#     status=request.POST.get('status')
+
+#     if not name:
+#         return JsonResponse({'success': False,'error': 'Task name is required','status':400})
+#     if not project_id:
+#         return JsonResponse({'success': False,'error': 'Project is required','status':400})
+
+#     try:
+#         project = Project.objects.get(id=project_id)
+#         task = Task.objects.create(name=name, project=project, owner=user, status=status)
+#         return JsonResponse({'success': True,'task_id': task.id, 'task':serialize_task(task)})
+#     except Project.DoesNotExist:
+#         return JsonResponse({'success': False,'error': 'Project not found','status':404})
+    
 @require_POST
 def create_task_ajax(request):
-    name = request.POST.get('name')
-    project_id = request.POST.get('project_id')
-    user = request.user
+    form = TaskUpdateForm(request.POST)
 
-    if not name:
-        return JsonResponse({'success': False,'error': 'Task name is required','status':400})
-    if not project_id:
-        return JsonResponse({'success': False,'error': 'Project is required','status':400})
+    if not form.is_valid():
+        return JsonResponse({'success': False, 'errors': form.errors, 'status': 400})
+
+    project_id = request.POST.get("project_id")
+    status = request.POST.get("status")
 
     try:
         project = Project.objects.get(id=project_id)
-        task = Task.objects.create(name=name, project=project, owner=user)
-        return JsonResponse({'success': True,'task_id': task.id})
     except Project.DoesNotExist:
-        return JsonResponse({'success': False,'error': 'Project not found','status':404})
+        return JsonResponse({'success': False, 'error': 'Project not found', 'status': 404})
+
+    task = form.save(commit=False)
+    task.project = project
+    task.owner = request.user
+    task.status = status
+    task.save()
+
+    return JsonResponse({'success': True, 'task_id': task.id, 'task': serialize_task(task)})
+
     
+def serialize_task(task):
+    return {
+        'id': str(task.id),
+        'name': task.name,
+        'description': task.description,
+        'priority': task.priority,
+        'status': task.status,
+        'start_date': task.start_date.isoformat() if task.start_date else "",
+        'due_date': task.due_date.isoformat() if task.due_date else "",
+        'assigned_to': task.user_assigned_to.pk if task.user_assigned_to else "",
+        'assigned_user_profile_img': task.user_assigned_to.profile.profile_picture_url if task.user_assigned_to else "",
+        'assigned_user_full_name': task.user_assigned_to.profile.full_name if task.user_assigned_to else "",
+    }
+
+
 def get_task(request,task_id):
     try:
         task = Task.objects.get(id=task_id)
@@ -49,16 +89,7 @@ def get_task(request,task_id):
         return JsonResponse({'success': False,'error': 'Task not found','status':404})
     
     if request.method == 'GET':
-        task_data = {
-            'id': str(task.id),
-            'name': task.name,
-            'description': task.description,
-            'priority': task.priority,
-            'start_date': task.start_date.isoformat() if task.start_date else "",
-            'due_date': task.due_date.isoformat() if task.due_date else "",
-            'assigned_to': task.user_assigned_to.pk if task.user_assigned_to else ""
-        }
-        return JsonResponse({'success': True,'task': task_data})
+        return JsonResponse({'success': True,'task': serialize_task(task)})
 
 def update_task(request,task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -73,23 +104,12 @@ def update_task(request,task_id):
 
             #Send notification
             actor_username = request.user.username
-            task_user_profile = task.user_assigned_to.profile
-            verb = f"Task {task.name} assigned to {task_user_profile.full_name}"
+            task_user_profile = task.user_assigned_to.profile if task.user_assigned_to else ""
+            verb = f"Task {task.name} assigned to {task_user_profile.full_name}" if task_user_profile else f"Task {task.name} created"
             create_notification.delay(actor_username, verb, object_id=task.id, content_type_model='task',content_type_app_label='tasks')
 
             return  JsonResponse({'success': True,
-                                  'task' : {
-                                    'id': str(task.id),
-                                    'name': task.name,
-                                    'description': task.description,
-                                    'priority': task.priority,
-                                    'start_date': task.start_date.isoformat() if task.start_date else "",
-                                    'due_date': task.due_date.isoformat() if task.due_date else "",
-                                    'assigned_to': task.user_assigned_to.id if task.user_assigned_to else "",
-
-                                    'assigned_user_profile_img': task.user_assigned_to.profile.profile_picture_url if task.user_assigned_to else "",
-                                    'assigned_user_full_name': task.user_assigned_to.profile.full_name if task.user_assigned_to else "",
-                                }})
+                                  'task' : serialize_task(task)})
         else:
             return JsonResponse({'success': False,'error': form.errors,'status':400})
     else:

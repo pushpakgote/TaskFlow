@@ -1,16 +1,17 @@
-
 {% extends "base.html" %}
 
-
 {% block content %}
-<h2>Confirm Deletion</h2>
+<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Confirm Deletion</h2>
 
-<p>Are you sure you want to delete the team "{{ team.name }}"?</p>
+        <p class="mt-4 text-gray-600 dark:text-gray-400">Are you sure you want to delete the team "{{ team.name }}"?</p>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{{ request.GET.next }}" class="btn btn-secondary">Cancel</a>
-</form>
-
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">Delete</button>
+            <a href="{{ request.GET.next }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</a>
+        </form>
+    </div>
+</div>
 {% endblock %}

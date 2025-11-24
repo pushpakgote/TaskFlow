@@ -1,95 +1,97 @@
 {% load static %}
 
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="w-64 bg-gray-800 text-white flex-shrink-0" >
     <!-- Brand Logo -->
-    <a href="{% url 'accounts:dashboard' %}" class="brand-link">
-      <img src="{% static "dist/img/AdminLTELogo.png" %}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">TaskFlow</span>
+    <a href="{% url 'accounts:dashboard' %}" class="flex items-center justify-center h-16 bg-gray-900">
+      <img src="{% static 'taskflow_logo/taskflow.png' %}" alt="AdminLTE Logo" class="w-8 h-8 rounded-full shadow-md" style="opacity: .8">
+      <span class="ml-2 text-lg font-light">TaskFlow</span>
     </a>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="p-4">
       <!-- Sidebar user panel (optional) -->
-      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-          <img src="{{ request.user.profile.profile_picture_url }}" class="img-circle elevation-2" alt="User Image">
+      <div class="flex items-center my-3 pb-3">
+        <div class="w-10 h-10">
+          <img src="{{ request.user.profile.profile_picture_url }}" class="rounded-full shadow-sm" alt="User Image">
         </div>
-        <div class="info">
-          <a href="{% url 'accounts:profile-detail' request.user.profile.pk %}" class="d-block">{{request.user.profile.full_name}}</a>
+        <div class="ml-3">
+          <a href="{% url 'accounts:profile-detail' request.user.profile.pk %}" class="block">{{request.user.profile.full_name}}</a>
         </div>
       </div>
 
+      {% comment %}
       <!-- SidebarSearch Form -->
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
+      <div class="flex">
+        <div class="relative flex-grow">
+          <input class="w-full bg-gray-700 text-white rounded-md py-2 px-3 leading-tight focus:outline-none focus:bg-gray-600" type="search" placeholder="Search" aria-label="Search">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <button class="text-gray-400 hover:text-white">
               <i class="fas fa-search fa-fw"></i>
             </button>
           </div>
         </div>
       </div>
+      {% endcomment %}
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="flex flex-col space-y-1">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
 
                <!-- Home -->
-               <li class="nav-item">
-                <a href="{% url 'accounts:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %} active {% endif %} ">
-                  <i class="nav-icon fas fa-chart-line"></i>
-                  <p>Dashboard</p>
+               <li>
+                <a href="{% url 'accounts:dashboard' %}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'dashboard' %} bg-gray-900 text-white {% else %} text-gray-300 hover:bg-gray-700 hover:text-white {% endif %}">
+                  <i class="fas fa-chart-line w-6"></i>
+                  <span class="ml-2">Dashboard</span>
                 </a>
               </li>
 
                 <!-- Projects -->
-                <li class="nav-item">
-                  <a href="#" class="nav-link {% if request.resolver_match.url_name == 'create' or  request.resolver_match.url_name == 'list_filtered' or request.resolver_match.url_name == 'list'%} active {% endif %}">
-                    <i class="nav-icon fas fa-project-diagram"></i>
-                    <p>
-                      Projects
-                      <i class="fas fa-angle-left right"></i>
-                    </p>
+                <li>
+                  <a href="#" class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'create' or  request.resolver_match.url_name == 'list_filtered' or request.resolver_match.url_name == 'list'%} bg-gray-900 text-white {% else %} text-gray-300 hover:bg-gray-700 hover:text-white {% endif %}">
+                    <div class="flex items-center">
+                        <i class="fas fa-project-diagram w-6"></i>
+                        <span class="ml-2">Projects</span>
+                    </div>
+                    <i class="fas fa-angle-left"></i>
                   </a>
-                  <ul class="nav nav-treeview">
-                    <li class="nav-item">
-                      <a href="{% url 'projects:list' %}" class="nav-link {% if request.resolver_match.url_name in 'list,list_filtered' %}active{% endif %}">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>All Projects</p>
+                  <ul class="ml-4 mt-1 space-y-1">
+                    <li>
+                      <a href="{% url 'projects:list' %}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'list' or request.resolver_match.url_name == 'list_filtered' %} bg-gray-700 {% endif %} text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <i class="far fa-circle w-6"></i>
+                        <span class="ml-2">All Projects</span>
                       </a>
                     </li>
-                    <li class="nav-item">
-                      <a href="{% url 'projects:create' %}" class="nav-link {% if request.resolver_match.url_name == 'create' %} active {% endif %}">
-                        <i class="far fa-circle nav-icon"></i>
-                        <p>Add Project</p>
+                    <li>
+                      <a href="{% url 'projects:create' %}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'create' %} bg-gray-700 {% endif %} text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <i class="far fa-circle w-6"></i>
+                        <span class="ml-2">Add Project</span>
                       </a>
                     </li>
                   </ul>
                 </li>
 
-              <!-- Tasks -->
-              <li class="nav-item  ">
-                <a href="#" class="nav-link {% if request.resolver_match.url_name == 'team-create' or request.resolver_match.url_name == 'team-list'%} active {% endif %}">
-                  <i class="nav-icon fas fa-users"></i>
-                  <p>
-                    Teams
-                    <i class="fas fa-angle-left right"></i>
-                  </p>
+              <!-- Teams -->
+              <li>
+                <a href="#" class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'team-create' or request.resolver_match.url_name == 'team-list'%} bg-gray-900 text-white {% else %} text-gray-300 hover:bg-gray-700 hover:text-white {% endif %}">
+                    <div class="flex items-center">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="ml-2">Teams</span>
+                    </div>
+                    <i class="fas fa-angle-left"></i>
                 </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{% url 'teams:team-list' %}" class="nav-link {% if request.resolver_match.url_name == 'team-list' %}active{% endif %}">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>All Teams</p>
+                <ul class="ml-4 mt-1 space-y-1">
+                  <li>
+                    <a href="{% url 'teams:team-list' %}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'team-list' %} bg-gray-700 {% endif %} text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <i class="far fa-circle w-6"></i>
+                      <span class="ml-2">All Teams</span>
                     </a>
                   </li>
-                  <li class="nav-item">
-                    <a href="{% url 'teams:team-create' %}" class="nav-link {% if request.resolver_match.url_name == 'team-create' %}active{% endif %}">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Add Team</p>
+                  <li>
+                    <a href="{% url 'teams:team-create' %}" class="flex items-center px-3 py-2 rounded-md text-sm font-medium {% if request.resolver_match.url_name == 'team-create' %} bg-gray-700 {% endif %} text-gray-300 hover:bg-gray-700 hover:text-white">
+                      <i class="far fa-circle w-6"></i>
+                      <span class="ml-2">Add Team</span>
                     </a>
                   </li>
                 </ul>
@@ -101,3 +103,46 @@
     </div>
     <!-- /.sidebar -->
   </aside>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const menuItems = document.querySelectorAll('aside nav ul li');
+
+    menuItems.forEach(item => {
+        const link = item.querySelector('a');
+        const submenu = item.querySelector('ul');
+        const angleIcon = link.querySelector('.fa-angle-left');
+
+        if (submenu) {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                
+                const parentLi = link.parentElement;
+                
+                if (parentLi.classList.contains('open')) {
+                    parentLi.classList.remove('open');
+                    submenu.style.maxHeight = '0';
+                    if (angleIcon) {
+                        angleIcon.classList.remove('rotate-90');
+                    }
+                } else {
+                    // Close all other open submenus
+                    document.querySelectorAll('aside nav ul li.open').forEach(openItem => {
+                        openItem.classList.remove('open');
+                        openItem.querySelector('ul').style.maxHeight = '0';
+                        const openAngleIcon = openItem.querySelector('.fa-angle-left');
+                        if (openAngleIcon) {
+                            openAngleIcon.classList.remove('rotate-90');
+                        }
+                    });
+                    
+                    parentLi.classList.add('open');
+                    submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                    if (angleIcon) {
+                        angleIcon.classList.add('rotate-90');
+                    }
+                }
+            });
+        }
+    });
+});
+</script>

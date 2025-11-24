@@ -1,39 +1,303 @@
-{% extends "account/login.html" %}
+{% extends "allauth/layouts/base.html" %}
 {% load i18n %}
-{% load allauth_ui %}
 {% load widget_tweaks %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    body {
+        font-family: "Inter", sans-serif !important;
+        background: #f4f6f9 !important;  /* light gray like AdminLTE */
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .login-container {
+        max-width: 450px;
+        width: 100%;
+    }
+
+    .glass-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2.2rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e5e7eb;
+    }
+
+    .logo-section {
+        text-align: center;
+        margin-bottom: 1.8rem;
+    }
+
+    .logo-icon {
+        width: 80px;
+        height: 80px;
+        /* background: #007bff; */
+        color: white;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem auto;
+        /* box-shadow: 0 4px 10px rgba(0,123,255,0.3); */
+    }
+
+    .gradient-text {
+        color: #1f2937;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .welcome-text {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .signup-prompt {
+        text-align: center;
+        margin-bottom: 1.4rem;
+        padding: 0.9rem;
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .signup-prompt p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    .signup-prompt a {
+        color: #007bff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .signup-prompt a:hover {
+        text-decoration: underline;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.4rem;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 10px;
+        background: white;
+        font-size: 0.9rem;
+        transition: border-color 0.25s;
+    }
+
+    .input-field:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+    }
+
+    .error-text {
+        color: #dc2626;
+        font-size: 0.75rem;
+        margin-top: 3px;
+    }
+
+    .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.4rem;
+    }
+
+    .checkbox-modern {
+        width: 18px;
+        height: 18px;
+        accent-color: #007bff;
+        margin-right: 5px;
+    }
+
+    .remember-me span,
+    .forgot-link {
+        font-size: 0.85rem;
+        color: #374151;
+    }
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
+
+    .btn-gradient {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: #007bff;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-gradient:hover {
+        background: #0056d2;
+    }
+
+    .divider {
+        margin: 1.4rem 0;
+        text-align: center;
+        position: relative;
+    }
+
+    .divider::before {
+        content: "";
+        position: absolute;
+        left: 0; right: 0;
+        top: 50%;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    .divider span {
+        position: relative;
+        background: white;
+        padding: 0 1rem;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    .btn-secondary {
+        width: 100%;
+        display: block;
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        background: #f3f4f6;
+        color: #374151;
+        text-align: center;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+        background: #e5e7eb;
+    }
+
+    .footer-text p {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 1rem;
+    }
+</style>
+
+{% endblock extra_head %}
+
 {% block content %}
-    {% trans "Sign In" as heading %}
-    {% #container heading=heading  %}
-    {% if not SOCIALACCOUNT_ONLY %}
-        <div class="py-3">
-            {% blocktranslate %}If you have not created an account yet, then please
-            <a class="link" href="{{ signup_url }}">sign up</a> first.{% endblocktranslate %}
-        </div>
-        {% url 'account_login' as action_url %}
-        {% #form form=form url=action_url button_text=heading %}
-        {% if form.remember %}
-            <div class="items-start my-2 form-control">
-                <label class="cursor-pointer label">
-                    {% render_field form.remember class="checkbox checkbox-accent" %}
-                    <span class="ml-2 label-text">{% trans "Remember me" %}</span>
-                </label>
+<div class="login-container">
+    <div class="glass-card">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <img src="{% static 'taskflow_logo/taskflow.png' %}" alt="Taskflow Logo" >
+                
             </div>
+            <h1 class="gradient-text">TaskFlow</h1>
+            <p class="welcome-text">Welcome back! Please sign in to continue</p>
+        </div>
+        
+        <!-- Sign Up Prompt -->
+        {% url 'account_signup' as signup_url %}
+        {% if signup_url %}
+        <div class="signup-prompt">
+            <p>
+                Don't have an account? 
+                <a href="{{ signup_url }}">Sign up</a> now!
+            </p>
+        </div>
         {% endif %}
-        {{ redirect_field }}
-        {% csrf_token %}
-        {% comment %} <div class="flex flex-col">
-            <a class="link self-end text-sm"
-               href="{% url "account_reset_password" %}">{% trans "Forgot password?" %}</a>
-        </div> {% endcomment %}
-        {% /form %}
-    {% endif %}
-    {% if LOGIN_BY_CODE_ENABLED %}
-        <div class="divider divider-neutral"></div>
-        <a href="{{ request_login_code_url }}" class="btn btn-neutral">{% trans "Mail me a sign-in code" %}</a>
-    {% endif %}
-    {% if SOCIALACCOUNT_ENABLED %}
-        {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
-    {% endif %}
-    {% /container %}
+        
+        <!-- Login Form -->
+        {% url 'account_login' as action_url %}
+        <form method="post" action="{{ action_url }}">
+            {% csrf_token %}
+            
+            <!-- Form Fields -->
+            {% for field in form.visible_fields %}
+                {% if field.name != 'remember' %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}" class="form-label">
+                        {{ field.label }}
+                    </label>
+                    {% render_field field class="input-field" placeholder=field.label %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                        <p class="error-text">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+            
+            <!-- Remember Me & Forgot Password -->
+             <br>
+            {% if form.remember %}
+            <div class="remember-forgot">
+                <label class="remember-me">
+                    {% render_field form.remember class="checkbox-modern" %}
+                    <span>{% trans "Remember me" %}</span>
+                </label>
+                <a href="{% url 'account_reset_password' %}" class="forgot-link">
+                    {% trans "Forgot password?" %}
+                </a>
+            </div>
+            {% endif %}
+            
+            {{ redirect_field }}
+            
+            <!-- Submit Button -->
+            <button type="submit" class="btn-gradient">
+                {% trans "Sign In" %}
+            </button>
+        </form>
+        
+        <!-- Login by Code -->
+        {% if LOGIN_BY_CODE_ENABLED %}
+            <div class="divider">
+                <span>Or</span>
+            </div>
+            <a href="{{ request_login_code_url }}" class="btn-secondary">
+                {% trans "Mail me a sign-in code" %}
+            </a>
+        {% endif %}
+
+        {% comment %}
+        
+        <!-- Social Account Login -->
+        {% if SOCIALACCOUNT_ENABLED %}
+            <div class="divider">
+                <span>Or continue with</span>
+            </div>
+            {% include "socialaccount/snippets/login.html" with page_layout="entrance" %}
+        {% endif %}
+        
+        {% endcomment %}
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer-text">
+        <p>© 2024 TaskFlow. All rights reserved.</p>
+    </div>
+</div>
 {% endblock content %}

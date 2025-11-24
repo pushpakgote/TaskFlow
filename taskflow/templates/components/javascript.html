@@ -4,12 +4,8 @@
 <!-- REQUIRED SCRIPTS -->
 <!-- jQuery -->
 <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-<!-- Bootstrap -->
-<script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <!-- overlayScrollbars -->
 <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js' %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.min.js' %}"></script>
 
 <!-- PAGE PLUGINS -->
 <!-- jQuery Mapael -->
@@ -21,9 +17,31 @@
 <!-- ChartJS -->
 <script src="{% static "plugins/chart.js/Chart.min.js" %}"></script>
 
-<!-- AdminLTE for demo purposes -->
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-{% comment %} <script src="{% static "dist/js/pages/dashboard2.js" %}"></script> {% endcomment %}
+<!-- Custom JS -->
+<script src="{% static 'dist/js/dropdown.js' %}"></script>
+<script src="{% static 'dist/js/tabs.js' %}"></script>
+<script src="{% static 'dist/js/modal.js' %}"></script>
+<script src="{% static 'dist/js/task_modal.js' %}"></script>
+<script src="{% static 'dist/js/sidebar_toggle.js' %}"></script>
+<script src="{% static 'dist/js/card_widgets.js' %}"></script>
+
 <!-- Required JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+
+
+
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            animate: true,
+            disableMobile: "true", // Force custom picker on mobile for consistency
+            prevArrow: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>',
+            nextArrow: '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>'
+        });
+    });
+</script>

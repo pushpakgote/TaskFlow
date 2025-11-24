@@ -78,9 +78,8 @@ class Task(models.Model):
             return 'primary'
         else:
             return ''
-    
 
-
+    @property
     def priority_color(self):
         if self.priority == 'Low':
             return 'success'
@@ -88,3 +87,8 @@ class Task(models.Model):
             return 'warning'
         else:
             return 'danger'
+        
+    @property
+    def stroke_offset(self):
+        total = 113
+        return total - int((total * self.progress) / 100)

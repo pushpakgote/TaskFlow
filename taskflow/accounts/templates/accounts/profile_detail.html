@@ -4,322 +4,206 @@
 
 {% block content %}
 
- <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-3">
+ <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-1">
 
             <!-- Profile Image -->
-            <div class="card card-primary card-outline">
-              <div class="card-body box-profile">
-                <div class="text-center">
-                  <img class="profile-user-img img-fluid img-circle"
-                       src="{{ profile.profile_picture_url }}"
-                       alt="User profile picture">
-                </div>
-
-                <h3 class="profile-username text-center">{{ profile.full_name }}</h3>
-
-                <p class="text-muted text-center">{{ profile.job_title}}</p>
-
-                <ul class="list-group list-group-unbordered mb-3">
-                  <li class="list-group-item">
-                    <b>Projects</b> <a class="float-right">{{ user_projects_count }}</a>
-                  </li>
-                  <li class="list-group-item">
-                    <b>Tasks</b> <a class="float-right">{{ user_tasks_count }}</a>
-                  </li>
-                </ul>               
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+              <div class="text-center">
+                <img class="h-32 w-32 rounded-full mx-auto"
+                     src="{{ profile.profile_picture_url }}"
+                     alt="User profile picture">
               </div>
-              <!-- /.card-body -->
+
+              <h3 class="text-xl font-bold text-center mt-4 text-gray-900 dark:text-white">{{ profile.full_name }}</h3>
+
+              <p class="text-gray-600 dark:text-gray-400 text-center">{{ profile.job_title}}</p>
+
+              <ul class="mt-4">
+                <li class="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-700">
+                  <span class="font-bold text-gray-900 dark:text-white">Projects</span> <a class="text-blue-500">{{ user_projects_count }}</a>
+                </li>
+                <li class="flex justify-between items-center py-2">
+                  <span class="font-bold text-gray-900 dark:text-white">Tasks</span> <a class="text-blue-500">{{ user_tasks_count }}</a>
+                </li>
+              </ul>               
             </div>
             <!-- /.card -->
 
             <!-- About Me Box -->
-            <div class="card card-primary">
-              <div class="card-header">
-                <h3 class="card-title">About Me</h3>
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg mt-6">
+              <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">About Me</h3>
               </div>
-              <!-- /.card-header -->
-              <div class="card-body">
+              <div class="p-6">
                 <strong><i class="fas fa-book mr-1"></i> Education</strong>
-
-                <p class="text-muted">
+                <p class="text-gray-600 dark:text-gray-400 mt-2">
                   {{ profile.education_level}}
                 </p>
-
-                <hr>
-
+                <hr class="my-4 border-gray-200 dark:border-gray-700">
                 <strong><i class="fas fa-map-marker-alt mr-1"></i> Location</strong>
-
-                <p class="text-muted">{{ profile.location }}</p>
-
-                <hr>
-
+                <p class="text-gray-600 dark:text-gray-400 mt-2">{{ profile.location }}</p>
+                <hr class="my-4 border-gray-200 dark:border-gray-700">
                 <strong><i class="fas fa-pencil-alt mr-1"></i> Skills</strong>
-
-                <p class="text-muted">
+                <p class="text-gray-600 dark:text-gray-400 mt-2">
                   {{ profile.skills }}
                 </p>
-
-                <hr>
-
+                <hr class="my-4 border-gray-200 dark:border-gray-700">
                 <strong><i class="far fa-file-alt mr-1"></i> Biography</strong>
-
-                <p class="text-muted">{{ profile.bio }}</p>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">{{ profile.bio }}</p>
               </div>
-              <!-- /.card-body -->
             </div>
             <!-- /.card -->
           </div>
           <!-- /.col -->
-          <div class="col-md-9">
-            <div class="card">
-              <div class="card-header p-2">
-                <ul class="nav nav-pills">
-                  <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Projects</a></li>
-                  <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Tasks</a></li>
-                  
+          <div class="md:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+              <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                <ul class="flex">
+                  <li class="mr-1"><a class="text-blue-500 hover:bg-blue-500 hover:text-white py-2 px-4 rounded-md" href="#activity">Projects</a></li>
+                  <li class="mr-1"><a class="text-blue-500 hover:bg-blue-500 hover:text-white py-2 px-4 rounded-md" href="#timeline">Tasks</a></li>
                 </ul>
               </div><!-- /.card-header -->
-              <div class="card-body">
+              <div class="p-6">
                 <div class="tab-content">
-                  <div class="active tab-pane" id="activity">
-
-                     <div class="card-body p-0">
-          <table class="table table-striped projects">
-              <thead>
-                  <tr>
-                      <th style="width: 1%">
-                          #
-                      </th>
-                      <th style="width: 20%">
-                          Project Name
-                      </th>
-                      <th style="width: 30%">
-                          Team Members
-                      </th>
-                      <th>
-                          Project Progress
-                      </th>
-                      <th style="width: 8%" class="text-center">
-                          Priority
-                      </th>
-                      <th style="width: 20%">
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-
-                {% for project in page_obj %}
-                  <tr>
-                      <td>
-                         {{ forloop.counter }}
-                      </td>
-                      <td>
-                          <a href="{% url "projects:project-detail" project.id %}">
-                              {{ project.name }}
-                          </a>
-                          <br/>
-                          <small>
-                              Created {{ project.start_date }}
-                          </small>
-                      </td>
-                      <td>
-                          <ul class="list-inline">
-                            {% for member in project.team.members.all %}
-                              <li class="list-inline-item">
-                                  <img alt="Avatar" class="table-avatar" src="{{ member.profile.profile_picture_url }}">
-                              </li>
-                              {% endfor %}
-                              
-                          </ul>
-                      </td>
-                      <td class="project_progress">
-                          <div class="progress progress-sm">
-                              <div class="progress-bar bg-{{project.status_color}}" role="progressbar" aria-valuenow="{{ project.progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{project.progress}}%">
-                              </div>
+                  <div class="tab-pane" id="activity">
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full">
+                          <thead>
+                              <tr>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 1%">#</th>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 20%">Project Name</th>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 30%">Team Members</th>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Project Progress</th>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-center text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 8%">Priority</th>
+                                  <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700" style="width: 20%"></th>
+                              </tr>
+                          </thead>
+                          <tbody class="bg-white dark:bg-gray-800">
+                            {% for project in page_obj %}
+                              <tr>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">{{ forloop.counter }}</td>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                      <a href="{% url "projects:project-detail" project.id %}" class="text-blue-500 hover:underline">{{ project.name }}</a>
+                                      <br/>
+                                      <small class="text-gray-600 dark:text-gray-400">Created {{ project.start_date }}</small>
+                                  </td>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                      <ul class="flex space-x-1">
+                                        {% for member in project.team.members.all %}
+                                          <li>
+                                              <img alt="Avatar" class="h-8 w-8 rounded-full" src="{{ member.profile.profile_picture_url }}">
+                                          </li>
+                                        {% endfor %}
+                                      </ul>
+                                  </td>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                      <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                          <div class="bg-{{project.status_color}}-600 h-2.5 rounded-full" style="width: {{project.progress}}%"></div>
+                                      </div>
+                                      <small class="text-gray-600 dark:text-gray-400">{{ project.progress}}% Complete</small>
+                                  </td>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700 text-center">
+                                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ project.priority_color }}-100 text-{{ project.priority_color }}-800">{{ project.priority }}</span>
+                                  </td>
+                                  <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700 text-right">
+                                    {% if request.user == project.owner %}
+                                      <a href="{% url "projects:update" project.pk %}" class="px-1 py-1 mx-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600">
+                                          <i class="fas fa-pencil-alt"></i>
+                                      </a>
+                                      <a href="{% url "projects:delete" project.pk %}" class="px-2 py-1 mx-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600">
+                                          <i class="fas fa-trash"></i>
+                                      </a>
+                                    {% endif %}
+                                  </td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                      </table>
+                      {% include "components/paginator.html" %}
+                      {% if messages %}
+                        <div class="mt-4">
+                          {% for message in messages %}
+                          <div class="p-4 mb-4 text-sm text-blue-700 bg-blue-100 rounded-lg dark:bg-blue-200 dark:text-blue-800" role="alert">
+                            {{ message }}
                           </div>
-                          <small>
-                            {{ project.progress}}% Complete
-                          </small>
-                      </td>
-                      <td class="project-state">
-                          <span class="badge badge-{{ project.priority_color }}">{{ project.priority }}</span>
-                      </td>
-                      <td class="project-actions text-right">
-                         
-                        {% if request.user == project.owner %}
-                          <a href="{% url "projects:update" project.pk %}" class="btn btn-info btn-sm" href="#">
-                              <i class="fas fa-pencil-alt">
-                              </i>
-                              Edit
-                          </a>
-
-                          
-                           <a href="{% url "projects:delete" project.pk %}" class="btn btn-danger btn-sm" href="#">
-                              <i class="fas fa-trash">
-                              </i>
-                              Delete
-                          </a>
-                          {% endif %}
-                         
-                      </td>
-                  </tr>
-
-                  {% endfor %}
-
-
-
-              </tbody>
-          </table>
-
-       {% include "components/paginator.html" %}
-
-
-        {% comment %} displaying messages {% endcomment %}
-            {% if messages %}
-            <div class="messages col-10">
-              {% for message in messages %}
-              <div class="alert {% if message.tags %}alert-{{message.tags}}{% else %}alert-info{% endif %}">
-                {{ message }}
-              </div>
-              
-              {% endfor %}
-
-            </div>
-            
-            {% endif %}
-
-       
-
-
-        </div>
-        <!-- /.card-body -->
-                  
-                    <!-- /.post -->
-                  </div>
-
-
-                  <!-- /.tab-pane -->
-                  <div class="tab-pane" id="timeline">
-
-                      <div class="card-body p-0">
-          <table class="table table-striped projects">
-              <thead>
-                  <tr>
-                      <th style="width: 1%">
-                          #
-                      </th>
-                      <th style="width: 20%">
-                          Task Name
-                      </th>
-                      <th style="width: 30%">
-                          Team Members
-                      </th>
-                      <th>
-                          Task Progress
-                      </th>
-                      <th style="width: 8%" class="text-center">
-                          Priority
-                      </th>
-                      <th style="width: 20%">
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-
-                {% for task in tasks %}
-                  <tr>
-                      <td>
-                         {{ forloop.counter }}
-                      </td>
-                      <td>
-                          <a href="">
-                              {{ task.name }}
-                          </a>
-                          <br/>
-                          <small>
-                              Created {{ task.created_at }}
-                          </small>
-                      </td>
-                      <td>
-                          <ul class="list-inline">
-                            {% for member in task.project.team.members.all %}
-                              <li class="list-inline-item">
-                                  <img alt="Avatar" class="table-avatar" src="{{ member.profile.profile_picture_url }}">
-                              </li>
-                              {% endfor %}
-                              
-                          </ul>
-                      </td>
-                      <td class="project_progress">
-                          <div class="progress progress-sm">
-                              <div class="progress-bar bg-{{task.status_color}}" role="progressbar" aria-valuenow="{{ task.progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{task.progress}}%">
-                              </div>
-                          </div>
-                          <small>
-                            {{ task.progress}}% Complete
-                          </small>
-                      </td>
-                      <td class="project-state">
-                          <span class="badge badge-{{ task.priority_color }}">{{ task.priority }}</span>
-                      </td>
-                    
-                  </tr>
-
-                  {% endfor %}
-
-
-
-              </tbody>
-          </table>
-
-       {% include "components/paginator.html" with page_obj=tasks query_name="task_page" %}
-
-
-       
-
-
-        </div>
-
-                    
-                  </div>
-                  <!-- /.tab-pane -->
-
-                 
-                </div>
-                <!-- /.tab-content -->
-                 <hr>
-                 <br>
-                 <h2 class="card-title">Comments {{ all_user_comments_count }}</h2>
-                  <br>
-                   <br>
-
-                 <!-- comments start here -->
-                  {% for comment in  comments %}
-                    <!-- Comment -->
-                    <div class="post">
-                      <div class="user-block">
-                        <img class="img-circle img-bordered-sm" src="{{ comment.user.profile.profile_picture_url}}" alt="user image">
-                        <span class="username">
-                          <a href="#">{{ comment.user.profile.full_name }}</a>
-                          <a href="#" class="float-right btn-tool"><i class="fas fa-times"></i></a>
-                        </span>
-                        <span class="description">Shared publicly - {{ comment.created_at | timesince }}</span>
-                      </div>
-                      <!-- /.user-block -->
-                      <p>
-                       {{ comment.comment }}
-                      </p>
-
+                          {% endfor %}
+                        </div>
+                      {% endif %}
                     </div>
-                    <!-- /.post -->
-                     {% endfor %}
-
-                      {% include "components/paginator.html" with page_obj=comments query_name="comment_page" %}
-
-
-
+                  </div>
+                  <div class="tab-pane hidden" id="timeline">
+                      <div class="overflow-x-auto">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 1%">#</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 20%">Task Name</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 30%">Team Members</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Task Progress</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-center text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 8%">Priority</th>
+                                    <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700" style="width: 20%"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800">
+                              {% for task in tasks %}
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">{{ forloop.counter }}</td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                        <a href="" class="text-blue-500 hover:underline">{{ task.name }}</a>
+                                        <br/>
+                                        <small class="text-gray-600 dark:text-gray-400">Created {{ task.created_at }}</small>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                        <ul class="flex space-x-1">
+                                          {% for member in task.project.team.members.all %}
+                                            <li>
+                                                <img alt="Avatar" class="h-8 w-8 rounded-full" src="{{ member.profile.profile_picture_url }}">
+                                            </li>
+                                          {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                            <div class="bg-{{task.status_color}}-600 h-2.5 rounded-full" style="width: {{task.progress}}%"></div>
+                                        </div>
+                                        <small class="text-gray-600 dark:text-gray-400">{{ task.progress}}% Complete</small>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700 text-center">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ task.priority_color }}-100 text-{{ task.priority_color }}-800">{{ task.priority }}</span>
+                                    </td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                        </table>
+                        {% include "components/paginator.html" with page_obj=tasks query_name="task_page" %}
+                      </div>
+                  </div>
+                </div>
+                <hr class="my-4 border-gray-200 dark:border-gray-700">
+                <br>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Comments {{ all_user_comments_count }}</h2>
+                <br>
+                <br>
+                {% for comment in  comments %}
+                  <div class="mt-4">
+                    <div class="flex items-start">
+                      <img class="h-10 w-10 rounded-full" src="{{ comment.user.profile.profile_picture_url}}" alt="user image">
+                      <div class="ml-3">
+                        <div class="flex items-center justify-between">
+                          <a href="#" class="text-sm font-medium text-gray-900 dark:text-white">{{ comment.user.profile.full_name }}</a>
+                          <a href="#" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"><i class="fas fa-times"></i></a>
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Shared publicly - {{ comment.created_at | timesince }}</span>
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                         {{ comment.comment }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+                {% include "components/paginator.html" with page_obj=comments query_name="comment_page" %}
               </div><!-- /.card-body -->
             </div>
             <!-- /.card -->
@@ -329,4 +213,35 @@
         <!-- /.row -->
       </div><!-- /.container-fluid -->
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll('[href="#activity"], [href="#timeline"]');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+
+            // Remove active styling + all text colors
+            tabs.forEach(t => {
+                t.classList.remove('bg-blue-500', 'text-white');
+                t.classList.forEach(c => {
+                    if (c.startsWith('text-')) t.classList.remove(c);
+                });
+            });
+
+            // Show clicked tab
+            const target = document.querySelector(this.getAttribute('href'));
+            target.classList.remove('hidden');
+
+            // Add active styling
+            this.classList.add('bg-blue-500', 'text-white');
+        });
+    });
+});
+</script>
+
 {% endblock %}
+

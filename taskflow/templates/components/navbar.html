@@ -1,105 +1,97 @@
-<nav class="main-header navbar navbar-expand navbar-dark">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="dashboard.html" class="nav-link">Home</a>
-      </li>
-      <li class="nav-item d-none d-sm-inline-block">
-        <a href="#" class="nav-link">Teams</a>
-      </li>
-    </ul>
+<nav class="bg-white dark:bg-gray-800 shadow-md relative z-50">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Left navbar links -->
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <a class="text-gray-800 dark:text-white" data-widget="pushmenu" href="#" role="button"><i
+                            class="fas fa-bars"></i></a>
+                </div>
 
-    <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
-
-      
-      <!-- Navbar Search -->
-      <li class="nav-item">
-        <a class="nav-link" data-widget="navbar-search" href="#" role="button">
-          <i class="fas fa-search"></i>
-        </a>
-        <div class="navbar-search-block">
-          <form class="form-inline">
-            <div class="input-group input-group-sm">
-              <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-              <div class="input-group-append">
-                <button class="btn btn-navbar" type="submit">
-                  <i class="fas fa-search"></i>
-                </button>
-                <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
             </div>
-          </form>
+
+            <!-- Right navbar links -->
+            <div class="hidden md:block">
+                <div class="ml-4 flex items-center md:ml-6">
+                    <!-- Navbar Search -->
+
+
+                    <!-- Notifications Dropdown Menu -->
+                    <div class="ml-3 relative">
+                        <div>
+                            <button type="button"
+                                class="p-1 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                                id="notifications-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <span class="sr-only">View notifications</span>
+                                <i class="far fa-bell"></i>
+                                <span
+                                    class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                                    {{notification_count }}</span>
+                            </button>
+                        </div>
+                        <div class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                            role="menu" aria-orientation="vertical" aria-labelledby="notifications-menu-button"
+                            tabindex="-1">
+                            <span class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                                {{notification_count }} Notifications</span>
+                            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                            {% for notification in latest_notifications %}
+                            <a href="#"
+                                class="block px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                                role="menuitem" tabindex="-1">
+                                <div class="flex flex-col">
+                                    <div class="text-sm text-gray-800 dark:text-gray-200 mb-1">
+                                        <i class="fas fa-envelope mr-2 text-blue-500"></i>
+                                        {{ notification.verb|truncatechars:30 }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 text-right">
+                                        {{ notification.created_at|timesince }} ago
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="border-t border-gray-100 dark:border-gray-700"></div>
+                            {% endfor %}
+                            <a href="{% url 'notifications:notification-list' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 text-center"
+                                role="menuitem" tabindex="-1">See All Notifications</a>
+                        </div>
+                    </div>
+
+                    <!-- Profile Dropdown Menu -->
+                    <div class="ml-3 relative">
+                        <div>
+                            <button type="button"
+                                class="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                                id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                <span class="sr-only">Open user menu</span>
+                                <img class="h-8 w-8 rounded-full" src="{{ request.user.profile.profile_picture_url }}"
+                                    alt="user picture">
+                            </button>
+                        </div>
+                        <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+                            role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                            <span class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200">
+                                Welcome, {{ request.user.profile.full_name }}</span>
+                            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                            <a href="{% url 'accounts:profile-update' request.user.profile.pk %}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                role="menuitem" tabindex="-1"><i class="fas fa-cog mr-2"></i> Edit Profile</a>
+                            <a href="{% url 'account_change_password' %}"
+                                class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                role="menuitem" tabindex="-1"><i class="fas fa-lock mr-2"></i> Change Password</a>
+                            <div class="border-t border-gray-200 dark:border-gray-700"></div>
+                            <form action="{% url 'account_logout' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    role="menuitem" tabindex="-1">
+                                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </li>
-
-      <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">{{ notification_count }}</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-item dropdown-header">{{ notification_count }} Notifications</span>
-          <div class="dropdown-divider"></div>
-
-          {% for notification in latest_notifications %}
-              <a href="#" class="dropdown-item">
-                <i class="fas fa-envelope mr-2"></i> {{ notification.verb |truncatechars:25 }}
-                <span class="float-right text-muted text-sm">{{notification.created_at }}</span>
-              </a>
-              <div class="dropdown-divider"></div>
-          {% endfor %}
-
-          <a href="{% url "notifications:notification-list" %}" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-      </li>
-
-
-         <!-- Profile Dropdown Menu -->
-         <li class="nav-item dropdown">
-          <a class="nav-link" data-toggle="dropdown" href="#">
-            <img class="img-circle elevation-2" src="{{ request.user.profile.profile_picture_url }}" height="30" width="30" alt="user picture">
-          </a>
-          <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">Welcome, {{ request.user.profile.full_name }}</span>
-            <div class="dropdown-divider"></div>
-  
-                <a href="{% url 'accounts:profile-update' request.user.profile.pk %}" class="dropdown-item">
-                  <i class="fas fa-cog mr-2"></i> Edit Profile
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="{% url 'account_change_password' %}" class="dropdown-item">
-                  <i class="fas fa-lock mr-2"></i> Change Password
-                </a>
-                <div class="dropdown-divider"></div>
-
-              <form action="{% url 'account_logout' %}" method="post">
-                {% csrf_token %}
-                  <button  class="dropdown-item">
-                    <i class="fas fa-sign-out-alt mr-2"></i> Logout
-                  </button>
-                  <div class="dropdown-divider"></div>
-              </form> 
-                
-         
-  
-            <a href="{% url 'notifications:notification-list' %}" class="dropdown-item dropdown-footer">See All Notifications</a>
-          </div>
-        </li>
-
-
-
-      <li class="nav-item">
-        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-          <i class="fas fa-expand-arrows-alt"></i>
-        </a>
-      </li>
-      
-    </ul>
-  </nav>
+    </div>
+</nav>

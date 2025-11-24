@@ -1,0 +1,132 @@
+<div class="w-80 flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-2xl p-3 board-column" 
+     data-status="{{ column_id }}">
+    <div class="flex items-center justify-between mb-4 px-1">
+        <div class="flex items-center gap-2">
+            <h3 class="text-gray-700 dark:text-gray-300 font-semibold text-lg">
+                {{ column_title }}
+            </h3>
+            <!-- MODIFIED: Added task-count class -->
+            <span class="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs font-semibold px-2 py-1 rounded-full task-count">
+                {{ tasks|length }}
+            </span>
+        </div>
+        <button onclick="openTaskModal('{{ column_id }}')"
+                class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition"
+                title="Add new task">
+            <i class="fas fa-plus-circle text-lg"></i>
+        </button>
+    </div>
+    
+    <div class="column-drop-zone space-y-3 min-h-[200px] rounded-lg">
+        {% for task in tasks %}
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition task-card" 
+             data-task-id="{{ task.id }}">
+             
+            <!-- Task Header -->
+            <div class="flex justify-between items-start mb-2">
+                <div class="task-title font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight flex-1">
+                    {{ task.name }}
+                </div>
+                <div class="task-actions flex items-center gap-2 ml-2">
+                    <button data-action="edit-task" 
+                            class="text-gray-400 hover:text-blue-600 transition"
+                            title="Edit task">
+                        <i class="fas fa-edit text-sm"></i>
+                    </button>
+                    {% comment %} <button data-action="delete-task" 
+                            class="text-gray-400 hover:text-red-600 transition"
+                            title="Delete task">
+                        <i class="fas fa-trash text-sm"></i>
+                    </button> {% endcomment %}
+                </div>
+            </div>
+            
+            <!-- Description -->
+            {% if task.description %}
+            <div class="task-description text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 transition-all duration-300">
+                {{ task.description }}
+            </div>
+            {% endif %}
+            
+            <!-- Footer with inline priority, date, progress, and assignee -->
+            <div class="flex justify-between items-center mt-4">
+                <div class="flex items-center gap-3">
+                    
+                    
+                    <!-- Date -->
+                    <div class="flex items-center gap-1 text-gray-500 text-xs">
+                        <i class="far fa-calendar"></i>
+                        <span class="task-due-date {% if task.due_date %}font-bold{% endif %}">
+                            {% if task.due_date %}
+                                {{ task.due_date|date:"M d" }}
+                            {% else %}
+                                No Due date
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <!-- Priority Badge (Inline) -->
+                    {% if task.priority %}
+                    <span class="priority-badge priority-{{ task.priority|lower }} rounded-sm" data-priority="{{ task.priority|lower }}">
+                        {{ task.priority }}
+                    </span>
+                    {% endif %}
+                    
+                    <!-- Circular Progress (for non-completed tasks) -->
+                    {% if show_progress and not is_completed %}
+                    <div class="circular-progress" data-progress="{{ task.progress|default:0 }}" title="{{ task.progress|default:0 }}% complete">
+                        <svg class="progress-ring" width="24" height="24">
+                            <circle class="progress-ring-circle-bg" 
+                                    stroke="#e5e7eb" 
+                                    stroke-width="3" 
+                                    fill="transparent" 
+                                    r="9" 
+                                    cx="12" 
+                                    cy="12"/>
+                            <circle class="progress-ring-circle" 
+                                    stroke="{% if column_color == 'blue' %}#3b82f6{% elif column_color == 'yellow' %}#fbbf24{% elif column_color == 'green' %}#10b981{% else %}#6b7280{% endif %}" 
+                                    stroke-width="3" 
+                                    fill="transparent" 
+                                    r="9" 
+                                    cx="12" 
+                                    cy="12"
+                                    stroke-dasharray="56.55"
+                                    stroke-dashoffset="{{ 56.55|add:0|floatformat:2|add:0 }}"
+                                    style="stroke-dashoffset: calc(56.55 - (56.55 * {{ task.progress|default:0 }}) / 100); transition: stroke-dashoffset 0.3s ease;"/>
+                        </svg>
+                        <span class="progress-text">{{ task.progress|default:0 }}%</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Completed Badge -->
+                    {% if is_completed %}
+                    <div class="flex items-center gap-1 text-green-600 text-xs font-semibold">
+                        <i class="far fa-check-circle"></i>
+                        {% comment %} <span>100%</span> {% endcomment %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Assignee Avatar -->
+                    <div class="task-assignee flex items-center -space-x-2">
+                        {% if task.user_assigned_to %}
+                        <img src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
+                             alt="{{ task.user_assigned_to.get_full_name }}"
+                             class="task-avatar w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 shadow"
+                             title="{{ task.user_assigned_to.get_full_name }}">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- MODIFIED: Added empty-message-placeholder class -->
+        <div class="text-center text-gray-400 dark:text-gray-500 py-8 empty-message-placeholder">
+            <i class="fas fa-inbox text-3xl mb-2"></i>
+            <p class="text-sm">No tasks yet</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+

@@ -141,8 +141,8 @@ class ProjectDetailView(DetailView):
         context['notification_count'] = latest_notifications.count()
         context["header_text"] = "Project Details"
         context["title"] = project.name
-        context["my_company"] = "TaskFlow"
-        context["my_company_description"] = "TaskFlow is an open source project management system."
+        context["my_company"] = project.name
+        context["my_company_description"] = project.description
         context["comments"] = comments
         context["page_obj"] = page_obj
         context['comments_count'] = comments.count()

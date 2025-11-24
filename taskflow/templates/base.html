@@ -9,57 +9,78 @@
     </title>
 
 
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * {
+    transition: all 0.3s ease-in-out;
+  }
+  aside nav ul li ul {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+  .rotate-90 {
+    transform: rotate(-90deg);
+  }
+</style>
 {% include "components/css.html" %}
 
 {% block page_css %}
+ <!-- Tempus Dominus Bootstrap 4 -->
+ <link rel="stylesheet" href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
 {% endblock %}
 
 </head>
-<body class="hold-transition dark-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
-<div class="wrapper">
+{% if user.is_authenticated %}
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 
   <!-- Preloader -->
-  <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__wobble" src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTELogo" height="60" width="60">
+  <div class="preloader flex flex-col justify-center items-center h-screen absolute inset-0 bg-white dark:bg-gray-900 z-50">
+    <img class="animate-bounce" src="{% static 'dist/img/AdminLTELogo.png' %}" alt="AdminLTELogo" height="60" width="60">
   </div>
 
-  <!-- Navbar -->
-  {% include "components/navbar.html" %}
-  <!-- /.navbar -->
+<div class="flex h-screen bg-gray-200 dark:bg-gray-800 font-roboto">
+    {% include "components/sidebar.html" %}
 
-  <!-- Main Sidebar Container -->
- {% include "components/sidebar.html" %}
+    <div class="flex-1 flex flex-col overflow-hidden">
+        {% include "components/navbar.html" %}
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper {% if is_kanban %} kanban {% endif %}">
-    <!-- Content Header (Page header) -->
-    {% include 'components/header_content.html' %}
-    <!-- /.content-header -->
+        <!-- Content Wrapper. Contains page content -->
+        <div class="flex-1 overflow-x-hidden overflow-y-auto">
+            <!-- Content Header (Page header) -->
+            {% include 'components/header_content.html' %}
+            <!-- /.content-header -->
 
-    <!-- Main content -->
-    <section class="content">
-      {% block content %}
-      
-      {% endblock %}
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+            <!-- Main content -->
+            <section class="p-6">
+              {% block content %}
+              
+              {% endblock %}
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
 
-  <!-- Control Sidebar -->
-  <aside class="control-sidebar control-sidebar-dark">
-    <!-- Control sidebar content goes here -->
-  </aside>
-  <!-- /.control-sidebar -->
-
-  <!-- Main Footer -->
-  {% include "components/footer.html" %}
+        {% comment %} {% include "components/footer.html" %} {% endcomment %}
+    </div>
 </div>
+
+{% endif %}
 <!-- ./wrapper -->
 
 {% include "components/javascript.html" %}
 
 {% block script %}
+<!-- Tempus Dominus Bootstrap 4 -->
+<script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js' %}"></script>
 {% endblock %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const preloader = document.querySelector('.preloader');
+    if (preloader) {
+      preloader.classList.add('hidden');
+    }
+  });
+</script>
 </body>
 </html>

@@ -79,19 +79,19 @@ class Project(models.Model):
     @property
     def status_color(self):
         if self.progress==100:
-            return 'success'
+            return 'green'
         elif self.progress==50:
-            return 'primary'
+            return 'blue'
         else:
-            return ''
+            return 'gray'
 
     def priority_color(self):
         if self.priority == 'Low':
-            return 'success'
+            return 'green'
         elif self.priority == 'Medium':
-            return 'warning'
+            return 'yellow'
         else:
-            return 'danger'
+            return 'red'
         
 def project_attachment_path_location(instance, filename):
     todays_date = datetime.now().strftime('%Y-%m-%d')

@@ -1,46 +1,72 @@
-
 {% extends "base.html" %}
 {% block title %} {{title }} | {{block.super }}{% endblock %}
-{% load crispy_forms_tags %}
+
 {% block content %}
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-<div class="row">
-    <div class="col-md-6">
-        {% comment %} {{ form.as_p }} {% endcomment %}
-       <div class="card card-primary">
-        <div class="card-header">
-          <h3 class="card-title">Update Profile</h3>
-
-          <div class="card-tools">
-            <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-              <i class="fas fa-minus"></i>
-            </button>
-          </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-1">
+            <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Update Profile</h3>
+                    <div class="flex space-x-2">
+                        <button type="button" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    {% load form_tags %}
+                    <div class="space-y-4">
+                        <div>
+                            <label for="{{ form.job_title.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Job Title</label>
+                            {{ form.job_title|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.profile_picture.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
+                            {{ form.profile_picture|add_class:"w-full" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.education_level.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Education Level</label>
+                            {{ form.education_level|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.skills.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Skills</label>
+                            {{ form.skills|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.bio.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+                            {{ form.bio|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.phone_number.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number</label>
+                            {{ form.phone_number|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+                            {{ form.location|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 px-3 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" }}
+                        </div>
+                        <div>
+                            <label for="{{ form.date_of_birth.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date of Birth</label>
+                            <div class="relative">
+                                {{ form.date_of_birth|add_class:"w-full bg-gray-100 border border-gray-300 rounded-md py-2 pl-3 pr-10 text-gray-700 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent datepicker" }}
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-calendar text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-          <div class="form-group">
-            {{ form|crispy }}
-           
-          </div>
-         
-         
+    </div>
+    <div class="mt-6">
+        <div class="flex justify-between">
+            <a href="{% url "accounts:dashboard" %}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</a>
+            <input type="submit" value="Save Changes" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
         </div>
-        <!-- /.card-body -->
-      </div>
-      <!-- /.card -->
     </div>
-
-
-    
-  </div>
-  <div class="row">
-    <div class="col-md-6">
-      <a href="{% url "accounts:dashboard" %}" class="btn btn-secondary">Cancel</a>
-      <input type="submit" value="Save Changes" class="btn btn-success float-right">
-    </div>
-  </div>
 </form>
 
 {% endblock  %}

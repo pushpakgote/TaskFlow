@@ -72,7 +72,7 @@ class TeamUpdateView(UpdateView):
     def get_object(self, queryset = None):
         team = get_object_or_404(Team, pk=self.kwargs['pk'])
 
-        if team.created_by != self.request.user and not self.request.user.is_superuser:
+        if team.created_by != self.request.user and not self.request.user.is_superuser and team.team_lead != self.request.user:
             raise Http404("You do not have permission to edit this team.")
         
         return team

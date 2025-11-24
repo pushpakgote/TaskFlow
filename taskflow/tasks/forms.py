@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 class TaskUpdateForm(forms.ModelForm):
     # Hidden
-    task_id = forms.CharField(widget=forms.HiddenInput(),required=True)
+    task_id = forms.CharField(widget=forms.HiddenInput(),required=False)
 
     description = forms.CharField(
         widget=forms.Textarea(
@@ -26,14 +26,14 @@ class TaskUpdateForm(forms.ModelForm):
         label="Assigned To"
     )
     start_date = forms.DateField(
-        widget=DatePicker(
-            attrs={'append':'fa fa-calendar','icon_toggle':True}
+        widget=forms.TextInput(
+            attrs={'class': 'datepicker'}
         ),
         required=False
     )
     due_date = forms.DateField(
-        widget=DatePicker(
-            attrs={'append':'fa fa-calendar','icon_toggle':True}
+        widget=forms.TextInput(
+            attrs={'class': 'datepicker'}
         ),
         required=False
     )
@@ -42,7 +42,7 @@ class TaskUpdateForm(forms.ModelForm):
         widget=forms.Select(
             attrs={'class':'form-control'}
         ),
-        required=True
+        required=False
         )
 
     class Meta:

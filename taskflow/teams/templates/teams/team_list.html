@@ -7,8 +7,8 @@
 
 {% block content %}
 
-    <section class="content">
-    <div class="container-fluid">
+    <section class="p-4">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         
         {% comment %}
         <div class="row mb-3">
@@ -19,72 +19,73 @@
             </div>
         </div>
         {% endcomment %}
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Teams</h3>
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Teams</h3>
             </div>
             <!-- /.card-header -->
-            <div class="card-body p-0">
-                <table class="table table-striped projects">
-                    <thead>
-                        <tr>
-                            <th style="width: 1%">#</th>
-                            <th style="width: 30%">Team Name</th>
-                            <th>Leader</th>
-                            <th style="width: 20%">Members</th>
-                            <th style="width: 20%" class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        {% for team in teams  %}
+            <div class="p-0">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead>
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>
-                                    {% comment %} <a href="{% url 'teams:detail' team.id %}">{{team.name}}</a> {% endcomment %}
-                                    <a href="#">{{team.name}}</a>
-                                    <br/>
-                                    <small>Created at {{team.created_at|date:"d M, Y"}}</small>
-                                </td>
-                                <td>{{team.team_lead.profile.full_name}}</td>
-                                <td>
-                                    <ul class="list-inline">
-                                        
-                                        {% with team.members.all as members  %}
-                                            {% if members %}
-                                                {% for member in members|slice:":3"  %}  
-                                                    <li class="list-inline-item">
-                                                        <img alt="User1" class="table-avatar" title="{{member.profile.full_name}}"
-                                                            src="{{ member.profile.profile_picture_url }}"
-                                                            style="width: 2.5rem; height: 2.5rem; border-radius: 50%; object-fit: cover;">
-                                                    </li>
-                                                {% endfor %}
-                                                
-                                                {% if members|length > 3 %}
-                                                    <li class="list-inline-item">
-                                                        <span class="badge badge-light">+{{members|length|add:"-3"}}</span>
-                                                    </li>
-                                                {% endif %}
-                                            {% else %}
-                                                <li class="list-inline-item text-muted">No members</li>
-                                            {% endif %}
-                                        {% endwith %}
-                                    </ul>
-                                </td>
-                                <td class="project-actions text-right">
-                                    {% if request.user == team.team_lead %}
-                                        <a class="btn btn-info btn-sm" href="{% url 'teams:team-update' team.id %}">
-                                            <i class="fas fa-pencil-alt"></i> Edit
-                                        </a>
-                                        <a class="btn btn-danger btn-sm" href="{% url 'teams:team-delete' team.id %}?next={{ request.path }}">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
-                                    {% endif %}
-                                </td>
+                                <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 1%">#</th>
+                                <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 30%">Team Name</th>
+                                <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Leader</th>
+                                <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700 text-left text-xs leading-4 font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider" style="width: 20%">Members</th>
+                                <th class="px-6 py-3 border-b-2 border-gray-300 dark:border-gray-700" style="width: 20%"></th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800">
+                            
+                            {% for team in teams  %}
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">{{ forloop.counter }}</td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                        {% comment %} <a href="{% url 'teams:detail' team.id %}">{{team.name}}</a> {% endcomment %}
+                                        <a href="#" class="text-blue-500 hover:underline">{{team.name}}</a>
+                                        <br/>
+                                        <small class="text-gray-600 dark:text-gray-400">Created at {{team.created_at|date:"d M, Y"}}</small>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">{{team.team_lead.profile.full_name}}</td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700">
+                                        <ul class="flex -space-x-2">
+                                            
+                                            {% with team.members.all as members  %}
+                                                {% if members %}
+                                                    {% for member in members|slice:":3"  %}  
+                                                        <li class="inline-block">
+                                                            <img alt="User1" class="h-10 w-10 rounded-full object-cover ring-2 ring-white" title="{{member.profile.full_name}}"
+                                                                src="{{ member.profile.profile_picture_url }}">
+                                                        </li>
+                                                    {% endfor %}
+                                                    
+                                                    {% if members|length > 3 %}
+                                                        <li class="inline-block">
+                                                            <span class="flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-600 text-xs font-medium ring-2 ring-white">+{{members|length|add:"-3"}}</span>
+                                                        </li>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <li class="text-gray-500 dark:text-gray-400">No members</li>
+                                                {% endif %}
+                                            {% endwith %}
+                                        </ul>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 dark:border-gray-700 text-right">
+                                        {% if request.user == team.team_lead %}
+                                            <a class="px-1 py-1 mx-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600" href="{% url 'teams:team-update' team.id %}">
+                                                <i class="fas fa-pencil-alt"></i> Edit
+                                            </a>
+                                            <a class="px-1 py-1 mx-1 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600" href="{% url 'teams:team-delete' team.id %}?next={{ request.path }}">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- /.card-body -->
              {% include 'components/paginator.html' %}

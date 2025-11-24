@@ -1,525 +1,809 @@
 {% extends "base.html" %}
-{% block title %}{{title }} |{{block.super}}{% endblock title %}
+{% block title %}{{ title }} | {{ block.super }}{% endblock title %}
 {% load static %}
 
-{% comment %} page specific css {% endcomment %}
-
 {% block page_css %}
-
- <!-- Ekko Lightbox -->
- <link rel="stylesheet" href="{% static 'plugins/ekko-lightbox/ekko-lightbox.css' %} ">
-
- <style>
-  .task-card {
-    cursor: grab;
-  }
-
-  .form-group {
-    display: flex;
-  }
-
-  #backlog h3 {
-    margin-right: 10px;
-  }
-
- </style>
-{% endblock  %}
+<link rel="stylesheet" href="{% static 'plugins/ekko-lightbox/ekko-lightbox.css' %}">
+<style>
+    .task-card {
+        cursor: grab;
+        transition: all 0.2s ease;
+    }
+    
+    .task-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .task-card:active {
+        cursor: grabbing;
+        transform: scale(0.98);
+    }
+    
+    .task-card.dragging {
+        opacity: 0.5;
+    }
+    
+    .column-drop-zone {
+        min-height: 100px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .column-drop-zone.drag-over {
+        background-color: rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Inline Priority Badges - Smaller */
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .priority-high { 
+        background-color: #fee2e2; 
+        color: #dc2626;
+    }
+    .priority-medium { 
+        background-color: #fef3c7; 
+        color: #d97706;
+    }
+    .priority-low { 
+        background-color: #dbeafe; 
+        color: #2563eb;
+    }
+    
+    /* Dark mode priority badges */
+    .dark .priority-high {
+        background-color: #7f1d1d;
+        color: #fca5a5;
+    }
+    .dark .priority-medium {
+        background-color: #78350f;
+        color: #fcd34d;
+    }
+    .dark .priority-low {
+        background-color: #1e3a8a;
+        color: #93c5fd;
+    }
+    
+    .task-actions {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .task-card:hover .task-actions {
+        opacity: 1;
+    }
+    
+    /* Circular Progress Indicator */
+    .circular-progress {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .progress-ring {
+        transform: rotate(-90deg);
+    }
+    
+    .progress-ring-circle {
+        transition: stroke-dashoffset 0.35s ease;
+        transform-origin: 50% 50%;
+    }
+    
+    /* Optional: Add text inside circle for better UX */
+    .progress-text {
+        position: absolute;
+        font-size: 7px;
+        font-weight: 600;
+        color: #6b7280;
+        pointer-events: none;
+    }
+    
+    .dark .progress-text {
+        color: #9ca3af;
+    }
+    
+    .dark .progress-ring-circle-bg {
+        stroke: #374151;
+    }
+    .task-description {
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-<div class="container-fluid h-100">
-
-    <div class="card card-row card-secondary board-column" id="backlog">
-      <div class="card-header">
-        <h3 class="card-title">
-          Backlog
-        </h3>
-
-        {% comment %} Task creation form  {% endcomment %}
-        <form id="create-task-form" data-project-id="{{ project.id}}" method="POST" action="{% url 'tasks:create-task-ajax' %}">
-          {% csrf_token %}
-          <div class="form-group">
-            <input type="text" id="task-name" name="name" class="form-control task-input" placeholde="New Task">
-          </div>
-        </form>
-        
-      </div>
-      <div class="card-body task-list">
-
-        {% for task in backlog_tasks %}
-            <div class="card card-secondary card-outline task-card" data-task-id="{{ task.id}}">
-              <div class="card-header">
-                <h5 class="card-title">{{ task.name }}</h5>
-                <div class="card-tools">
-                <a href="#" class="btn btn-tool btn-link task-counter"></a>
-                
-                  {% if task.user_assigned_to %}
-                  <a href="#" class="profile-img" >
-                    <img 
-                      src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
-                      height="20" width="20" 
-                      class="img-circle elevation-2" 
-                      alt="{{ task.user_assigned_to.profile.full_name }}">
-                    </a>
-                  {% endif %}
-                
-                <a href="#" class="btn btn-tool">
-                    <i class="fas fa-pen"></i>
-                </a>
-                </div>
-              </div>
-
-              {% comment %} task description {% endcomment %}
-              {% if task.description %}
-                <div class="card-body">
-                <p class="card-description">
-                  {{task.description}}
-                </p>
-              </div>
-              {% endif %}
-                
-            </div>
-        {% endfor %}
-
-     
-      </div>
-    </div>
-
-
-    <div class="card card-row card-primary board-column" id="to-do">
-      <div class="card-header">
-        <h3 class="card-title">
-          To Do
-        </h3>
-      </div>
-      <div class="card-body task-list">
-        {% for task in todo_tasks %}
-        <div class="card card-primary card-outline task-card" data-task-id="{{ task.id}}">
-          <div class="card-header">
-            <h5 class="card-title">{{ task.name }}</h5>
-            <div class="card-tools">
-              <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
-              {% if task.user_assigned_to %}
-                <a href="#" class="profile-img"></a>
-                  <img 
-                    src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
-                    height="20" width="20" 
-                    class="img-circle elevation-2" 
-                    alt="{{ task.user_assigned_to.profile.full_name }}">
-                  </a>
-                {% endif %}
-              <a href="#" class="btn btn-tool">
-                <i class="fas fa-pen"></i>
-              </a>
-            </div>
-          </div>
-          {% comment %} task description {% endcomment %}
-              {% if task.description %}
-                <div class="card-body">
-                <p class="card-description">
-                  {{task.description}}
-                </p>
-              </div>
-              {% endif %}
+{% comment %} <div class="mb-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Project Board</h2>
+        <div class="flex gap-2">
+            <button onclick="openTaskModal('backlog')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition flex items-center gap-2">
+                <i class="fas fa-plus"></i>
+                <span>Add Task</span>
+            </button>
         </div>
-        {% endfor %}
-      </div>
     </div>
+</div> {% endcomment %}
 
+<div class="flex gap-6 pb-6 overflow-x-auto h-full">
+    <!-- Planned Column -->
+    {% include 'tasks/partials/task_column.html' with column_id='Backlog' column_title='Backlog' tasks=backlog_tasks column_color='gray' show_progress=False %}
+    
+    <!-- To Do Column -->
+    {% include 'tasks/partials/task_column.html' with column_id='To Do' column_title='To Do' tasks=todo_tasks column_color='blue' show_progress=False %}
+    
+    <!-- In Progress Column -->
+    {% include 'tasks/partials/task_column.html' with column_id='In Progress' column_title='In Progress' tasks=in_progress_tasks column_color='yellow' show_progress=False %}
+    
+    <!-- Done Column -->
+    {% include 'tasks/partials/task_column.html' with column_id='Completed' column_title='Done' tasks=completed_tasks column_color='green' show_progress=False is_completed=False %}
+</div>
 
-    <div class="card card-row card-default board-column" id="in-progress">
-      <div class="card-header bg-info">
-        <h3 class="card-title">
-          In Progress
-        </h3>
-      </div>
-      <div class="card-body task-list">
+{% include "tasks/task_update_modal.html" %}
 
-        {% for task in in_progress_tasks %}
-        <div class="card card-primary card-outline task-card" data-task-id="{{ task.id}}">
-          <div class="card-header">
-            <h5 class="card-title">{{ task.name }}</h5>
-            <div class="card-tools">
-              <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
-              {% if task.user_assigned_to %}
-              <a href="#" class="profile-img"></a>
-                <img 
-                  src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
-                  height="20" width="20" 
-                  class="img-circle elevation-2" 
-                  alt="{{ task.user_assigned_to.profile.full_name }}">
-                </a>
-              {% endif %}
-              <a href="#" class="btn btn-tool">
-                <i class="fas fa-pen"></i>
-              </a>
-            </div>
-          </div>
-          {% comment %} task description {% endcomment %}
-              {% if task.description %}
-                <div class="card-body">
-                <p class="card-description">
-                  {{task.description}}
-                </p>
-              </div>
-              {% endif %}
-        
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="card card-row card-success board-column" id="completed">
-      <div class="card-header">
-        <h3 class="card-title">
-          Completed
-        </h3>
-      </div>
-      <div class="card-body task-list">
-        {% for task in completed_tasks %}
-        <div class="card card-success card-outline task-card" data-task-id="{{ task.id}}">
-          <div class="card-header">
-            <h5 class="card-title">{{ task.name }}</h5>
-            <div class="card-tools">
-              <a href="#" class="btn btn-tool btn-link">#{{ forloop.counter }}</a>
-              {% if task.user_assigned_to %}
-              <a href="#" class="profile-user-img"></a>
-                <img 
-                  src="{{ task.user_assigned_to.profile.profile_picture_url }}" 
-                  height="20" width="20" 
-                  class="img-circle elevation-2" 
-                  alt="{{ task.user_assigned_to.profile.full_name }}">
-                </a>
-              {% endif %}
-              <a href="#" class="btn btn-tool">
-                <i class="fas fa-pen"></i>
-              </a>
-            </div>
-          </div>
-          {% comment %} task description {% endcomment %}
-              {% if task.description %}
-                <div class="card-body">
-                <p class="card-description">
-                  {{task.description}}
-                </p>
-              </div>
-              {% endif %}
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-  {% include "tasks/task_update_modal.html" %}
-
-{% endblock  %}
-
+{% endblock %}
 
 {% block script %}
-
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-
-
-    const taskCards = document.querySelectorAll('.task-card');
-    taskCards.forEach(card => {
-      card.draggable = true;
-
-      card.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', card.dataset.taskId);
-        console.log(card.dataset)
-      })
-    });
-
-    const columns = document.querySelectorAll('.board-column');
-    columns.forEach(column => {
-      column.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        });
-
-      column.addEventListener('drop', (e) => {
-        const taskId = e.dataTransfer.getData('text/plain');
-        const taskCard = document.querySelector(`[ data-task-id="${taskId}"]`);
-
-        //get new status
-        const newStatus = column.id.replace('-', ' ');        
-
-        //move the task card to the new column
-        column.querySelector('.task-list').prepend(taskCard);
-
-        //update the class or color based on column
-        taskCard.classList.remove('card-primary', 'card-secondary', 'card-light', 'card-success');
-        if(column.id === 'backlog'){
-          taskCard.classList.add('card-secondary');
-        } else if (column.id === 'to-do'){
-          taskCard.classList.add('card-primary');
-        } else if ( column.id === 'in-progress'){
-          taskCard.classList.add('card-primary');
-        }else if (column.id === 'completed'){
-          taskCard.classList.add('card-success');
-        }
+document.addEventListener('DOMContentLoaded', function () {
+    const taskBoard = {
+        currentTaskId: null,
+        sourceColumn: null,
         
+        init() {
+            this.initDragAndDrop();
+            this.initTaskModal();
+            this.initQuickAdd();
 
-        //send ajax request to update task status
-        updateTaskStatus(taskId, newStatus);
-
-        updateTaskCounters();
-
-      })
-      
-    })
-
-    //update status ajax
-    function  updateTaskStatus(taskId, newStatus) {
-      fetch(`/tasks/update-task-status-ajax/${taskId}/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': '{{ csrf_token }}',
+            // expose globally so onclick works
+            window.openTaskModal = this.openTaskModal.bind(this);
         },
-        body: JSON.stringify({status: newStatus}),
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success){
-          console.log('Task status updated successfully');
+        
+        initDragAndDrop() {
+            const taskCards = document.querySelectorAll('.task-card');
+            const columns = document.querySelectorAll('.board-column');
+            
+            taskCards.forEach(card => {
+                card.draggable = true;
+                
+                card.addEventListener('dragstart', (e) => {
+                    card.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', card.dataset.taskId);
+                    this.sourceColumn = card.closest('.board-column'); 
+                });
+                
+                card.addEventListener('dragend', (e) => {
+                    card.classList.remove('dragging');
+                });
+            });
+            
+            columns.forEach(column => {
+                // We attach handlers to the whole column so dropping anywhere works
+                column.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // allow drop anywhere in column
+                    const dropZone = column.querySelector('.column-drop-zone');
+                    if (dropZone && !dropZone.classList.contains('drag-over')) {
+                        dropZone.classList.add('drag-over');
+                    }
+                    e.dataTransfer.dropEffect = 'move';
+                });
 
-        }else{
-          console.error('Error updating task status')
-        }
-      });
-    }
+                column.addEventListener('dragleave', (e) => {
+                    // When leaving the column remove highlight from the drop zone
+                    const dropZone = column.querySelector('.column-drop-zone');
+                    if (dropZone) dropZone.classList.remove('drag-over');
+                });
 
+                column.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    const dropZone = column.querySelector('.column-drop-zone');
+                    if (!dropZone) return;
 
-    //submitting form on enter key
-    const taskForm = document.getElementById('create-task-form');
-    const taskInput = document.getElementById('task-name');
-    const projectId = taskForm.getAttribute('data-project-id');
+                    dropZone.classList.remove('drag-over');
 
-    //get backlog column
-    const backlogColumn = document.getElementById('backlog');
+                    const taskId = e.dataTransfer.getData('text/plain');
+                    const taskCard = document.querySelector(`[data-task-id="${taskId}"]`);
+                    const newStatus = column.dataset.status;
+                    const destColumn = column;
 
-    if (taskForm && taskInput && projectId){
-      taskInput.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
+                    // If same column, just ignore UI updates but still clear sourceColumn
+                    if (this.sourceColumn === destColumn) {
+                        this.sourceColumn = null;
+                        return;
+                    }
 
-          const taskName = taskInput.value.trim();
-          if (taskName){
-            const formData = new FormData(taskForm);
-            formData.append('name', taskName);
-            formData.append('project_id', projectId);
+                    if (!taskCard) {
+                        this.sourceColumn = null;
+                        return;
+                    }
 
-            fetch(taskForm.action, {
-              method: taskForm.method,
-              body: formData,
-              headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'X-Requested-With': 'XMLHttpRequest'
-              }
+                    // Insert at the correct position based on mouse Y
+                    // Find the card element after which we should insert the dragged card
+                    const children = Array.from(dropZone.querySelectorAll('.task-card'));
+                    // Find first child whose midpoint is below the mouse Y (clientY)
+                    let inserted = false;
+                    const mouseY = e.clientY;
+
+                    for (let i = 0; i < children.length; i++) {
+                        const child = children[i];
+                        const rect = child.getBoundingClientRect();
+                        const midpoint = rect.top + rect.height / 2;
+                        if (mouseY < midpoint) {
+                            dropZone.insertBefore(taskCard, child);
+                            inserted = true;
+                            break;
+                        }
+                    }
+
+                    // If not inserted yet (dropped below all cards), append to end
+                    if (!inserted) {
+                        dropZone.appendChild(taskCard);
+                    }
+
+                    // Clean up dragging class
+                    taskCard.classList.remove('dragging');
+
+                    // Server update + UI counts
+                    this.updateTaskStatus(taskId, newStatus);
+                    this.updateColumnUI(this.sourceColumn, destColumn);
+
+                    // Reset source column
+                    this.sourceColumn = null;
+                });
+            });
+
+        },
+
+        updateColumnUI(srcColumn, destColumn) {
+            console.log("Inside updateColumnUI")
+            if (!srcColumn || !destColumn) return;
+            
+            console.log("Updating column UI for source:",srcColumn);
+            console.log("Updating column UI for destination:",destColumn);
+
+            // 1. Update task counts
+            const srcCountEl = srcColumn.querySelector('.task-count');
+            const destCountEl = destColumn.querySelector('.task-count');
+
+            if (srcCountEl) {
+                srcCountEl.textContent = parseInt(srcCountEl.textContent, 10) - 1;
+            }
+            if (destCountEl) {
+                destCountEl.textContent = parseInt(destCountEl.textContent, 10) + 1;
+            }
+
+            // 2. Handle "No tasks yet" message in destination column
+            const destEmptyMsg = destColumn.querySelector('.empty-message-placeholder');
+            if (destEmptyMsg) {
+                destEmptyMsg.remove();
+            }
+
+            // 3. Handle "No tasks yet" message in source column
+            // Check if the source column is now empty
+            const remainingTasks = srcColumn.querySelectorAll('.task-card').length;
+            console.log("Remaining tasks:",remainingTasks);
+            if (remainingTasks === 0) {
+                const dropZone = srcColumn.querySelector('.column-drop-zone');
+                if (dropZone) {
+                    // Add the placeholder back
+                    const placeholderHTML = `
+                        <div class="text-center text-gray-400 dark:text-gray-500 py-8 empty-message-placeholder">
+                            <i class="fas fa-inbox text-3xl mb-2"></i>
+                            <p class="text-sm">No tasks yet</p>
+                        </div>
+                    `;
+                    dropZone.innerHTML = placeholderHTML;
+                }
+            }
+        },
+        
+        updateTaskStatus(taskId, newStatus) {
+            console.log("Updating task status for task ID:",taskId);
+            fetch(`/tasks/update-task-status-ajax/${taskId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCsrfToken(),
+                },
+                body: JSON.stringify({ status: newStatus }),
             })
             .then(response => response.json())
             .then(data => {
-              if (data.success) {
-                console.log('Task created successfully', data.task_id);
-                taskInput.value = '';
-
-                //dynamically create the new task
-                const newTaskCard = document.createElement('div');
-                newTaskCard.classList.add('card', 'card-secondary', 'card-outline', 'task-card');
-                newTaskCard.setAttribute('data-task-id', data.task_id);
-                newTaskCard.draggable = true;
-
-                //add the task content
-                newTaskCard.innerHTML = `
-                <div class="card-header">
-                <h5 class="card-title">${taskName}</h5>
-                <div class="card-tools">
-                <a href="#" class="btn btn-tool btn-link task-counter"></a>
-                <a href="#" class="btn btn-tool">
-                    <i class="fas fa-pen"></i>
-                </a>
-                </div>
-            </div>  
-                `;
-
-                //append new created task to backlog column
-                const backlogTaskList = backlogColumn.querySelector('.task-list');
-                backlogTaskList.prepend(newTaskCard);
-
-                //updating task counter
-                updateTaskCounters();
-
-                //add drag and drop listener to the newly created task
-                newTaskCard.addEventListener('dragstart', (e) => {
-                  e.dataTransfer.setData('text/plain', newTaskCard.dataset.taskId);
-                });
-
-
-
-              }else{
-                console.error('Error:', data.error);
-              }
+              console.log("Response data:",data);
+                if (data.success) {
+                    this.showNotification('Task status updated successfully', 'success');
+                } else {
+                    this.showNotification('Error updating task status', 'error');
+                }
             })
             .catch(error => {
-              console.error('Error creating task: ', error);
+                console.error('Error:', error);
+                this.showNotification('Network error occurred', 'error');
             });
-
-
-          }else{
-            console.log('Task name is empty');
-          }         
-
-        }
-      });
-
-    }else{
-      console.error('Form, input, or project ID is not found');
-    }
-
-
-    //function to update task counters
-
-    function updateTaskCounters() {
-      const taskCards = backlogColumn.querySelectorAll('.task-card');
-      taskCards.forEach((card, index) => {
-        const taskCounter =  card.querySelector('.task-counter');
-        if(taskCounter){
-          taskCounter.textContent = `#${index + 1}`;
-        }
-      });
-    }
-
-    //calling update task counter on page load
-    updateTaskCounters();
-
-    const taskUpdateModal = document.getElementById('taskUpdateModal');
-    let currentTaskId = null;
-    document.addEventListener('click', function (event) {
-      const penIcon = event.target.closest('.fa-pen');
-      if (!penIcon) return; // only handle pen icon clicks
-
-      event.stopPropagation();
-      const currentTaskCard = penIcon.closest('.task-card');
-      currentTaskId = currentTaskCard.dataset.taskId;
-      const taskUpdateModal = document.getElementById('taskUpdateModal');
+        },
         
-        $('#taskUpdateModal').modal('show');
-
-        //Get task data from database
-        fetch(`/tasks/${currentTaskId}/get` , {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        }).then(response => response.json())
-        .then(data => {
-          if (data.error){
-            console.error(data.error);
-          }else{
-            task = data.task;
-            console.log(task);
-
-            //setting data into forms fields
-            taskUpdateModal.querySelector('input[name="task_id"]').value = task.id;
-            taskUpdateModal.querySelector('input[name="name"]').value = task.name;
-            taskUpdateModal.querySelector('textarea[name="description"]').value = task.description;
-            taskUpdateModal.querySelector('select[name="priority"]').value = task.priority;
-            taskUpdateModal.querySelector('input[name="start_date"]').value = task.start_date;
-            taskUpdateModal.querySelector('input[name="due_date"]').value = task.due_date;
-            taskUpdateModal.querySelector('select[name="user_assigned_to"]').value = task.assigned_to;
-
-            //$('#taskUpdateModal').modal('show');
-
-          }
-          
-        })
-        .catch(error => console.error('Error:', error));
-      })
-    
-    //Update task
-    const taskUpdateForm = document.getElementById('taskUpdateForm');
-    taskUpdateForm.addEventListener('submit', function (event) {
-      event.preventDefault();
-      const formData = new FormData(taskUpdateForm);
-      fetch(`/tasks/${currentTaskId}/update`, {
-        method: 'POST',
-        body: formData,
-        headers:{
-          'x-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-          
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.success){
-          const taskCard = document.querySelector(`.task-card[data-task-id="${currentTaskId}"]`);
-
-          if(taskCard){
-            taskCard.querySelector('.card-title').textContent = data.task.name;
+        initTaskModal() {
+            const modal = document.getElementById('taskUpdateModal');
             
-            let descriptionElement = taskCard.querySelector('.card-description');
-            if(descriptionElement){
-              descriptionElement.textContent = data.task.description;
-            }else if(data.task.description){
-              const cardBody = document.createElement('div');
-              cardBody.classList.add('card-body');
-              taskCard.appendChild(cardBody);
-              descriptionElement = document.createElement('p');
-              descriptionElement.classList.add('card-description');
-              descriptionElement.textContent = data.task.description;
-              cardBody.appendChild(descriptionElement);
-              
+            // Open modal on edit button click
+            document.addEventListener('click', (e) => {
+                const editBtn = e.target.closest('[data-action="edit-task"]');
+                if (editBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const taskCard = editBtn.closest('.task-card');
+                    this.openEditModal(taskCard.dataset.taskId);
+                }
+                
+                // Delete task
+                const deleteBtn = e.target.closest('[data-action="delete-task"]');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const taskCard = deleteBtn.closest('.task-card');
+                    this.deleteTask(taskCard.dataset.taskId, taskCard);
+                }
+            });
+            
+            // Close modal
+            const closeBtn = document.getElementById('closeTaskUpdateModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
             }
-
-            // --- Update or create profile image
-            const cardTools = taskCard.querySelector('.card-tools');
-            if (data.task.assigned_user_profile_img) {
-              let profileLink = cardTools.querySelector('.profile-img');
-
-              // if <a class="profile-img"> doesn’t exist, create it
-              if (!profileLink) {
-                profileLink = document.createElement('a');
-                profileLink.href = '#';
-                profileLink.classList.add('profile-img');
-                cardTools.insertBefore(profileLink, cardTools.querySelector('.fa-pen').closest('a'));  // insert before edit icon
-              }
-
-              // if <img> doesn’t exist, create it
-              let img = profileLink.querySelector('img');
-              if (!img) {
-                img = document.createElement('img');
-                img.height = 20;
-                img.width = 20;
-                img.classList.add('img-circle', 'elevation-2');
-                profileLink.appendChild(img);
-              }
-
-              // update img attributes
-              img.src = data.task.assigned_user_profile_img;
-              img.alt = data.task.assigned_user_full_name;
-            } else {
-              // if task now has no assigned user, remove old image if exists
-              const profileLink = cardTools.querySelector('.profile-img');
-              if (profileLink) profileLink.remove();
+            
+            // Submit form
+            const form = document.getElementById('taskUpdateForm');
+            if (form) {
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitTaskUpdate(form);
+                });
             }
+        },
+        openTaskModal(status) {
+            const modal = document.getElementById("taskUpdateModal");
+            this.currentTaskId = null;
 
-          }else {
-            console.error('Task card not found , task id:', currentTaskId);
-          }
-          
-          console.log('Task updated successfully');
-          $('#taskUpdateModal').modal('hide');
-        }else{
-          console.error('Error updating task:', data.error);
+            // Reset modal
+            modal.querySelector('input[name="task_id"]').value = "";
+            modal.querySelector('input[name="name"]').value = "";
+            modal.querySelector('textarea[name="description"]').value = "";
+            modal.querySelector('select[name="priority"]').value = "";
+            modal.querySelector('input[name="start_date"]').value = "";
+            modal.querySelector('input[name="due_date"]').value = "";
+
+            // Pre-fill status for new task
+            modal.querySelector('input[name="status"]').value = status;
+
+            modal.classList.remove("hidden");
+        },
+
+        
+        openEditModal(taskId) {
+            this.currentTaskId = taskId;
+            const modal = document.getElementById('taskUpdateModal');
+            modal.classList.remove('hidden');
+            
+            // Fetch task data
+            fetch(`/tasks/${taskId}/get`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    this.showNotification(data.error, 'error');
+                } else {
+                    this.populateModalForm(data.task);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.showNotification('Failed to load task data', 'error');
+            });
+        },
+        
+        populateModalForm(task) {
+            const modal = document.getElementById('taskUpdateModal');
+            modal.querySelector('input[name="task_id"]').value = task.id || '';
+            modal.querySelector('input[name="name"]').value = task.name || '';
+            modal.querySelector('textarea[name="description"]').value = task.description || '';
+            modal.querySelector('select[name="priority"]').value = task.priority || '';
+            modal.querySelector('input[name="start_date"]').value = task.start_date || '';
+            modal.querySelector('input[name="due_date"]').value = task.due_date || '';
+            
+            const assigneeSelect = modal.querySelector('select[name="user_assigned_to"]');
+            if (assigneeSelect && task.assigned_to) {
+                assigneeSelect.value = task.assigned_to;
+            }
+        },
+        
+        submitTaskUpdate(form) {
+            const formData = new FormData(form);
+            this.projectId = document.getElementById("taskUpdateForm").dataset.projectId;
+            formData.append('project_id', this.projectId);
+            console.log("Submitting task update for task ID:",this.currentTaskId,this.projectId)
+
+            let url;
+            let method = "POST";
+            let newTask = false;
+
+            // If taskId exists → update
+            if (this.currentTaskId) {
+                console.log("Updating task:", this.currentTaskId);
+                url = `/tasks/${this.currentTaskId}/update`;
+
+                fetch(url, {
+                    method: method,
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': this.getCsrfToken(),
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response data 1:",data);
+                    if (data.success) {
+                        console.log("Response data 1.5:",data);
+                        this.updateTaskCard(data.task);
+                        console.log("Response data 2:",data);
+                        document.getElementById('taskUpdateModal').classList.add('hidden');
+                        console.log("Response data 3:",data);
+                        this.showNotification('Task updated successfully', 'success');
+                        
+                    } else {
+                        this.showNotification(data.error || 'Error updating task', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.showNotification('Network error occurred', 'error');
+                });
+            } 
+            // Otherwise → create
+            else {
+                console.log("Creating new task");
+                url = `/tasks/create-task-ajax/`;
+                newTask = true;
+
+                fetch(url, {
+                    method: method,
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': this.getCsrfToken(),
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("create task Response data:",data);
+                    this.addTaskCardToColumn(data.task, data.task.status);
+                    document.getElementById('taskUpdateModal').classList.add('hidden');
+                    this.showNotification('Task created successfully', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.showNotification('Network error occurred', 'error');
+                });
+            }
+            
+        },
+        
+        updateTaskCard(taskData) {
+            const taskCard = document.querySelector(`[data-task-id="${taskData.id}"]`);
+            if (!taskCard) return;
+            
+            // Update title
+            const titleEl = taskCard.querySelector('.task-title');
+            if (titleEl) titleEl.textContent = taskData.name;
+            
+            // Update description
+            const descEl = taskCard.querySelector('.task-description');
+
+            if (descEl) {
+                // If description exists, update it or remove if empty
+                if (taskData.description) {
+                    descEl.textContent = taskData.description;
+                } else {
+                    descEl.remove();
+                }
+            } else if (taskData.description) {
+                // Insert new description **right AFTER the task header**
+                const headerRow = taskCard.querySelector('.flex.justify-between.items-start');
+
+                if (headerRow) {
+                    const descDiv = document.createElement('div');
+                    descDiv.className =
+                        'task-description text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 transition-all duration-300';
+                    descDiv.textContent = taskData.description;
+
+                    headerRow.insertAdjacentElement('afterend', descDiv);
+                }
+            }
+            
+            // Update priority badge
+            const priorityEl = taskCard.querySelector('.priority-badge');
+            if (taskData.priority) {
+                if (priorityEl) {
+                    priorityEl.className = `priority-badge priority-${taskData.priority.toLowerCase()}`;
+                    priorityEl.textContent = taskData.priority;
+                    priorityEl.dataset.priority = taskData.priority.toLowerCase();
+                } else {
+                    // Create priority badge if it doesn't exist
+                    const footerLeft = taskCard.querySelector('.flex.items-center.gap-3');
+                    if (footerLeft) {
+                        const priorityBadge = document.createElement('span');
+                        priorityBadge.className = `priority-badge priority-${taskData.priority.toLowerCase()}`;
+                        priorityBadge.textContent = taskData.priority;
+                        priorityBadge.dataset.priority = taskData.priority.toLowerCase();
+                        footerLeft.insertBefore(priorityBadge, footerLeft.firstChild);
+                    }
+                }
+            } else if (priorityEl) {
+                priorityEl.remove();
+            }
+                        
+            // Update due date
+            const dateEl = taskCard.querySelector('.task-due-date');
+            if (dateEl && taskData.due_date) {
+                dateEl.textContent = this.formatDate(taskData.due_date);
+            }
+            
+            // Update assignee image
+            const avatarEl = taskCard.querySelector('.task-avatar');
+            if (taskData.assigned_user_profile_img) {
+                if (avatarEl) {
+                    avatarEl.src = taskData.assigned_user_profile_img;
+                    avatarEl.alt = taskData.assigned_user_full_name;
+                } else {
+                    const avatarContainer = taskCard.querySelector('.task-assignee');
+                    if (avatarContainer) {
+                        avatarContainer.innerHTML = `
+                            <img src="${taskData.assigned_user_profile_img}" 
+                                alt="${taskData.assigned_user_full_name}"
+                                class="task-avatar w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 shadow">
+                        `;
+                    }
+                }
+            } else if (avatarEl) {
+                avatarEl.remove();
+            }
+          },
+        
+        deleteTask(taskId, taskCard) {
+            if (!confirm('Are you sure you want to delete this task?')) return;
+            
+            fetch(`/tasks/${taskId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCsrfToken(),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    taskCard.remove();
+                    this.showNotification('Task deleted successfully', 'success');
+                } else {
+                    this.showNotification('Error deleting task', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.showNotification('Network error occurred', 'error');
+            });
+        },
+        
+        initQuickAdd() {
+            const quickAddInputs = document.querySelectorAll('.quick-add-input');
+            
+            quickAddInputs.forEach(input => {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const taskName = input.value.trim();
+                        const columnId = input.closest('.board-column').dataset.status;
+                        
+                        if (taskName) {
+                            this.quickCreateTask(taskName, columnId, input);
+                        }
+                    }
+                });
+            });
+        },
+        
+        quickCreateTask(taskName, status, input) {
+            const formData = new FormData();
+            formData.append('name', taskName);
+            formData.append('status', status);
+            
+            fetch('/tasks/create-ajax/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': this.getCsrfToken(),
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    input.value = '';
+                    this.addTaskCardToColumn(data.task, status);
+                    this.showNotification('Task created successfully', 'success');
+                } else {
+                    this.showNotification(data.error || 'Error creating task', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.showNotification('Network error occurred', 'error');
+            });
+        },
+        
+        addTaskCardToColumn(task, columnId) {
+            console.log("Adding task card to column:",task,columnId);
+            const column = document.querySelector(`[data-status="${columnId}"] .column-drop-zone`);
+            if (!column) return;
+            
+            const taskCard = this.createTaskCardElement(task);
+            column.insertBefore(taskCard, column.firstChild);
+            
+            // Reinitialize drag and drop for new card
+            taskCard.draggable = true;
+            taskCard.addEventListener('dragstart', (e) => {
+                taskCard.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', taskCard.dataset.taskId);
+            });
+            taskCard.addEventListener('dragend', () => {
+                taskCard.classList.remove('dragging');
+            });
+        },
+        
+        createTaskCardElement(task) {
+            const div = document.createElement('div');
+            div.className = 'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition task-card';
+            div.dataset.taskId = task.id;
+            
+            // Calculate circular progress stroke
+            const progress = task.progress || 0;
+            const circumference = 56.55; // 2 * π * radius (radius = 9)
+            const strokeOffset = circumference - (circumference * progress) / 100;
+            
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="task-title font-semibold text-gray-900 dark:text-gray-100 text-sm leading-tight flex-1">
+                        ${task.name}
+                    </div>
+                    <div class="task-actions flex items-center gap-2 ml-2">
+                        <button data-action="edit-task" class="text-gray-400 hover:text-blue-600 transition">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        <button data-action="delete-task" class="text-gray-400 hover:text-red-600 transition">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                ${task.description ? `
+                    <div class="task-description text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                        ${task.description}
+                    </div>
+                ` : ''}
+                
+                <div class="flex justify-between items-center mt-4">
+                    <div class="flex items-center gap-3">
+                        ${task.priority ? `
+                            <span class="priority-badge priority-${task.priority.toLowerCase()}" data-priority="${task.priority.toLowerCase()}">
+                                ${task.priority}
+                            </span>
+                        ` : ''}
+                        
+                        <div class="flex items-center gap-1 text-gray-500 text-xs">
+                            <i class="far fa-calendar"></i>
+                            <span class="task-due-date">${task.due_date ? this.formatDate(task.due_date) : 'No date'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        ${task.status !== 'completed' && progress > 0 ? `
+                            <div class="circular-progress" data-progress="${progress}" title="${progress}% complete">
+                                <svg class="progress-ring" width="24" height="24">
+                                    <circle class="progress-ring-circle-bg" 
+                                            stroke="#e5e7eb" 
+                                            stroke-width="3" 
+                                            fill="transparent" 
+                                            r="9" 
+                                            cx="12" 
+                                            cy="12"/>
+                                    <circle class="progress-ring-circle" 
+                                            stroke="#3b82f6" 
+                                            stroke-width="3" 
+                                            fill="transparent" 
+                                            r="9" 
+                                            cx="12" 
+                                            cy="12"
+                                            stroke-dasharray="${circumference}"
+                                            stroke-dashoffset="${strokeOffset}"
+                                            style="transition: stroke-dashoffset 0.3s ease;"/>
+                                </svg>
+                                <span class="progress-text">${progress}%</span>
+                            </div>
+                        ` : ''}
+                        
+                        ${task.status === 'completed' ? `
+                            <div class="flex items-center gap-1 text-green-600 text-xs font-semibold">
+                                <i class="far fa-check-circle"></i>
+                                <span>100%</span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="task-assignee flex items-center -space-x-2">
+                            ${task.assigned_user_profile_img ? `
+                                <img src="${task.assigned_user_profile_img}" 
+                                    alt="${task.assigned_user_full_name}"
+                                    class="task-avatar w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 shadow">
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return div;
+          },
+        
+        formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        },
+        
+        getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        },
+        
+        showNotification(message, type = 'info') {
+            // Implement your notification system here
+            // For now, using console
+            console.log(`[${type.toUpperCase()}] ${message}`);
+            
+            // Optional: Use a toast library or create custom notifications
+            // Example with simple alert (replace with better UI)
+            if (type === 'error') {
+                // You can integrate with your existing notification system
+                alert(message);
+            }
         }
-      })
-      .catch(error => console.error('Error:', error));
+    };
+    
+    // Initialize the task board
+    taskBoard.init();
+});
 
-    });
+document.addEventListener("click", function (event) {
+    let card = event.target.closest(".task-card");
+    if (!card) return;
 
-  });
+    let desc = card.querySelector(".task-description");
+    if (!desc) return;
+
+    // Toggle line-clamp
+    desc.classList.toggle("line-clamp-2");
+});
 
 </script>
-
 {% endblock %}
