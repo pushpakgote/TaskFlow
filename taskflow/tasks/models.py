@@ -73,20 +73,20 @@ class Task(models.Model):
     @property
     def status_color(self):
         if self.progress==100:
-            return 'success'
+            return 'green'
         elif self.progress==50:
-            return 'primary'
+            return 'blue'
         else:
-            return ''
+            return 'gray'
 
     @property
     def priority_color(self):
         if self.priority == 'Low':
-            return 'success'
+            return 'green'
         elif self.priority == 'Medium':
-            return 'warning'
+            return 'yellow'
         else:
-            return 'danger'
+            return 'red'
         
     @property
     def stroke_offset(self):
